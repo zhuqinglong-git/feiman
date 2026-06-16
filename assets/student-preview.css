@@ -49,15 +49,6 @@
 .creation-side {
   display: none;
 }
-.creation-modal.question-picker-mode .creation-body {
-  grid-template-columns: 210px minmax(360px, 0.78fr) minmax(620px, 1.22fr);
-}
-.creation-modal.question-picker-mode .creation-side {
-  display: grid;
-}
-.creation-modal.question-picker-mode .creation-work {
-  min-width: 0;
-}
 .practice-phone {
   position: relative;
   width: 248px;
