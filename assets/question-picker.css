@@ -1,0 +1,199 @@
+.creation-modal.question-picker-mode .creation-body {
+  grid-template-columns: 210px minmax(360px, 0.78fr) minmax(620px, 1.22fr);
+}
+.creation-modal.question-picker-mode .creation-side {
+  align-content: stretch;
+}
+[data-side-default][hidden] {
+  display: none;
+}
+[data-side-default] {
+  display: grid;
+  gap: 14px;
+}
+.question-picker-panel[hidden] {
+  display: none;
+}
+.question-picker-panel {
+  display: grid;
+  grid-template-rows: auto auto auto auto auto auto 48px;
+  gap: 12px;
+  min-height: 0;
+  height: 100%;
+  background: #f2f5f9;
+  padding: 12px;
+  overflow: auto;
+  cursor: pointer;
+}
+.picker-head,
+.picker-tabs,
+.picker-summary,
+.picker-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.picker-head button,
+.picker-tabs button,
+.picker-summary button,
+.question-card button,
+.picker-footer button {
+  border: 0;
+  background: transparent;
+  color: var(--iteach-text-secondary);
+}
+.picker-head strong {
+  color: var(--iteach-text-primary);
+}
+.picker-head em {
+  margin-left: auto;
+  color: var(--iteach-text-secondary);
+  font-style: normal;
+  font-size: 12px;
+}
+.picker-tabs .active {
+  color: var(--iteach-blue-600);
+  font-weight: 700;
+}
+.picker-tabs label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  width: 220px;
+  height: 30px;
+  margin-left: auto;
+  border: 1px solid var(--iteach-border);
+  border-radius: var(--iteach-radius-sm);
+  background: #fff;
+  overflow: hidden;
+}
+.picker-tabs input {
+  border: 0;
+  box-shadow: none;
+}
+.picker-tabs label button,
+.picker-footer .primary,
+.question-card .join {
+  background: var(--iteach-blue-600);
+  color: #fff;
+}
+.picker-filters,
+.question-card {
+  border-radius: var(--iteach-radius-md);
+  background: #fff;
+  padding: 12px 14px;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  min-height: 36px;
+  color: var(--iteach-text-secondary);
+  font-size: 12px;
+}
+.filter-row b {
+  width: 72px;
+  color: var(--iteach-text-primary);
+}
+.filter-row span {
+  padding: 4px 8px;
+  border-radius: var(--iteach-radius-sm);
+}
+.filter-row span.active {
+  background: var(--iteach-blue-100);
+  color: var(--iteach-blue-600);
+}
+.filter-row select {
+  width: 180px;
+  height: 30px;
+}
+.select-row select {
+  width: 160px;
+}
+.picker-summary {
+  color: var(--iteach-text-secondary);
+  font-size: 12px;
+}
+.picker-summary a {
+  margin-left: auto;
+  color: var(--iteach-blue-600);
+}
+.question-card {
+  display: grid;
+  gap: 12px;
+}
+.q-meta,
+.question-card footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--iteach-text-secondary);
+  font-size: 12px;
+}
+.q-meta span {
+  padding: 2px 8px;
+  border-radius: var(--iteach-radius-sm);
+  background: #ffb13d;
+  color: #fff;
+}
+.q-meta strong {
+  margin-left: auto;
+  color: var(--iteach-text-secondary);
+}
+.q-body {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 220px;
+  gap: 12px;
+  align-items: start;
+  color: var(--iteach-text-primary);
+}
+.q-body i {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: #eef1f5;
+  color: var(--iteach-text-secondary);
+  font-style: normal;
+}
+.q-body p {
+  margin: 0;
+  line-height: 1.8;
+}
+.grid-thumb {
+  height: 82px;
+  background-color: #fff;
+  background-image: linear-gradient(#9da3ad 1px, transparent 1px), linear-gradient(90deg, #9da3ad 1px, transparent 1px), linear-gradient(90deg, transparent 47%, #555 47%, #555 53%, transparent 53%);
+  background-size: 18px 18px, 18px 18px, 100% 100%;
+  border: 1px solid #9da3ad;
+}
+.question-card footer {
+  border-top: 1px solid var(--iteach-border);
+  padding-top: 10px;
+}
+.question-card footer a,
+.question-card footer button,
+.question-card footer strong {
+  margin-left: auto;
+  color: var(--iteach-blue-600);
+}
+.question-card footer span {
+  margin-right: auto;
+}
+.picker-footer {
+  position: sticky;
+  bottom: 0;
+  justify-content: flex-end;
+  background: #f2f5f9;
+}
+.picker-footer span {
+  margin-right: auto;
+  color: var(--iteach-text-secondary);
+}
+.picker-footer button {
+  height: 32px;
+  min-width: 76px;
+  border-radius: var(--iteach-radius-sm);
+  background: #eef1f5;
+}

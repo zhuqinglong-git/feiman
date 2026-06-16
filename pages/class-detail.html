@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>班级练习详情 - 原型</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <link rel="stylesheet" href="../assets/class-detail.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="iteach-sidebar">
+        <div class="sidebar-logo"><img src="../assets/iteach-logo.png" alt="iTeach小学工作台" /></div>
+        <nav class="iteach-nav" aria-label="主导航">
+          <div class="nav-group-title">云盘（课件管理）</div>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-folder-cloud"></span><span class="nav-label">集团云盘</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-drive"></span><span class="nav-label">校本云盘</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-cloud"></span><span class="nav-label">个人云盘</span></a>
+          <div class="nav-group-title">课后练习</div>
+          <a class="nav-row" href="../index.html"><span class="tri"></span><span class="nav-icon icon-folder-check"></span><span class="nav-label">集团练习</span></a>
+          <a class="nav-row" href="../index.html"><span class="tri"></span><span class="nav-icon icon-screen-check"></span><span class="nav-label">校本练习</span></a>
+          <a class="nav-row" href="../index.html"><span class="tri"></span><span class="nav-icon icon-file-check"></span><span class="nav-label">个人练习</span></a>
+          <a class="nav-row expanded" href="#"><span class="tri"></span><span class="nav-icon icon-link"></span><span class="nav-label">绑定练习</span></a>
+          <a class="nav-row child active" href="class-detail.html"><span class="nav-icon icon-clipboard"></span><span class="nav-label">班级练习详情</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-book-stack"></span><span class="nav-label">小书童阅读详情</span></a>
+          <div class="nav-group-title">能力测评</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-report"></span><span class="nav-label">集团测评</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-check-square"></span><span class="nav-label">校本测评</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-chart"></span><span class="nav-label">成绩管理</span></a>
+          <div class="nav-group-title">素养打卡营</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-calendar-check"></span><span class="nav-label">活动列表</span></a>
+        </nav>
+        <button class="recycle" type="button"><span class="nav-icon icon-trash"></span><span>回收站</span></button>
+      </aside>
+
+      <main class="main class-detail-main">
+        <div class="avatar" aria-label="当前用户">owl</div>
+        <section class="class-detail-shell">
+          <header class="class-detail-head">
+            <div class="class-breadcrumb"><a href="../index.html">← 返回</a><span>班级练习详情</span><strong>YSSY20260003/大小屏测试班3</strong></div>
+            <nav class="lesson-tabs" aria-label="课次切换">
+              <button type="button">‹ 第1讲 <span>正课</span></button>
+              <button class="active" type="button">第2讲 <span>正课</span></button>
+              <button type="button">第3讲 <span>正课</span></button>
+              <button type="button">第4讲 <span>正课</span></button>
+              <button type="button">第5讲 <span>正课</span></button>
+              <button type="button">第6讲 <span>正课</span></button>
+              <button type="button">第7讲 <span>正课</span></button>
+              <button type="button">第8讲 <span>正课</span></button>
+              <button type="button">第9讲 <span>正课</span></button>
+              <button type="button">第10讲 ›</button>
+            </nav>
+            <div class="lesson-meta"><span>2026-04-24 12:30-13:30</span><span>正课</span><span>392965225</span></div>
+          </header>
+
+          <section class="completion-cards" aria-label="完成统计">
+            <article class="complete">
+              <strong>1</strong><span>人 / 已完成</span><em></em>
+            </article>
+            <article class="doing">
+              <strong>0</strong><span>人 / 进行中</span><em></em>
+            </article>
+            <article class="pending">
+              <strong>4</strong><span>人 / 未完成</span><em></em>
+            </article>
+          </section>
+
+          <section class="student-completion">
+            <div class="completion-head">
+              <div><h1>学员完成情况</h1><span class="legend done">已完成</span><span class="legend doing">进行中</span><span class="legend pending">未完成</span></div>
+              <div class="completion-actions"><button class="btn" type="button">全部⌄</button><button class="btn primary" type="button">催交作业</button></div>
+            </div>
+
+            <div class="completion-grid" role="table" aria-label="学员完成情况">
+              <div class="grid-head student">学员</div>
+              <div class="grid-head status-col">作答状态</div>
+              <div class="grid-head task-col">费曼练习</div>
+              <div class="grid-head blank"></div>
+              <div class="grid-head blank"></div>
+              <div class="grid-head blank"></div>
+              <div class="grid-head blank"></div>
+
+              <div class="student-cell"><span class="student-id">ID</span><strong>TESS高<br />坤</strong></div>
+              <div class="status-cell done">已完成</div>
+              <div class="task-cell">
+                <div class="feynman-task done">
+                  <span>做练习 共2题</span>
+                  <a href="report.html">学员报告及批改</a>
+                  <em>请去新东方教师APP查看</em>
+                </div>
+              </div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+
+              <div class="student-cell"><span class="student-id">ID</span><strong>TESS陈<br />佳玲</strong></div>
+              <div class="status-cell">未完成</div>
+              <div class="task-cell"><div class="empty-task">暂无完成数据</div></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+
+              <div class="student-cell"><span class="student-id">ID</span><strong>小彭</strong></div>
+              <div class="status-cell">未完成</div>
+              <div class="task-cell"><div class="empty-task">暂无完成数据</div></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+              <div class="empty-col"></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

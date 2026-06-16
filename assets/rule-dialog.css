@@ -1,0 +1,288 @@
+.rule-dialog-body {
+  display: grid;
+  gap: 14px;
+}
+.rule-dialog {
+  display: grid;
+  gap: 16px;
+}
+.rule-chat-zone,
+.rule-input-zone,
+.rule-action-zone {
+  border: 1px solid var(--iteach-border);
+  border-radius: var(--iteach-radius-md);
+  background: #fff;
+  padding: 16px;
+}
+.rule-chat-zone,
+.rule-input-zone {
+  display: grid;
+  gap: 12px;
+}
+.rule-chat-zone {
+  max-height: 560px;
+  overflow: auto;
+}
+.rule-zone-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--iteach-text-secondary);
+  font-size: 13px;
+}
+.rule-zone-title strong {
+  color: var(--iteach-text-primary);
+  font-size: 15px;
+}
+.rule-message {
+  display: flex;
+}
+.rule-message.teacher {
+  justify-content: flex-end;
+}
+.rule-message.ai {
+  justify-content: flex-start;
+}
+.rule-message-bubble {
+  width: min(680px, 82%);
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: var(--iteach-text-primary);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.rule-message.teacher .rule-message-bubble {
+  border-top-right-radius: 6px;
+  background: #ecfbff;
+}
+.rule-message.ai .rule-message-bubble {
+  border-top-left-radius: 6px;
+  background: #f7f9fc;
+  border: 1px solid #eef1f5;
+}
+.rule-message-bubble h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+.rule-message-bubble p,
+.rule-message-bubble li {
+  color: var(--iteach-text-primary);
+  line-height: 1.8;
+}
+.rule-message-bubble p {
+  margin: 0;
+}
+.generated-rule-output {
+  display: grid;
+  gap: 12px;
+}
+.rule-dimension {
+  display: grid;
+  gap: 8px;
+}
+.rule-dimension-title {
+  color: var(--iteach-blue-600);
+  font-weight: 700;
+}
+.rule-dimension textarea {
+  width: 100%;
+  border: 1px solid var(--iteach-border);
+  border-radius: var(--iteach-radius-sm);
+  padding: 10px;
+  line-height: 1.7;
+  resize: none;
+  overflow: hidden;
+}
+.rule-input-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.rule-input-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--iteach-border);
+  border-radius: var(--iteach-radius-md);
+  background: #fbfcff;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.rule-input-card span {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #eaf4ff;
+  color: var(--iteach-blue-600);
+  font-size: 12px;
+  font-weight: 700;
+}
+.rule-input-card strong {
+  font-size: 14px;
+}
+.rule-input-card em {
+  color: var(--iteach-text-secondary);
+  font-size: 12px;
+  font-style: normal;
+}
+.rule-text-entry {
+  display: grid;
+  gap: 8px;
+}
+.rule-text-entry label {
+  color: var(--iteach-text-primary);
+  font-weight: 700;
+}
+.rule-text-entry textarea {
+  width: 100%;
+  resize: vertical;
+}
+.rule-file-list {
+  display: grid;
+  gap: 8px;
+}
+.rule-file-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--iteach-border);
+  border-radius: var(--iteach-radius-md);
+  background: #fbfcff;
+  padding: 10px 12px;
+}
+.rule-file-chip span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.rule-file-chip.voice span {
+  background: #41b883;
+}
+.rule-file-chip.video span {
+  background: #3ca8f2;
+}
+.rule-file-chip div {
+  min-width: 0;
+  flex: 1;
+}
+.rule-file-chip strong,
+.rule-file-chip em {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rule-file-chip em {
+  color: var(--iteach-text-secondary);
+  font-size: 12px;
+  font-style: normal;
+}
+.rule-file-chip button {
+  border: 0;
+  background: transparent;
+  color: var(--iteach-blue-600);
+  cursor: pointer;
+}
+.rule-action-zone {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.rule-file-dialog {
+  width: min(520px, calc(100vw - 48px));
+  border-radius: var(--iteach-radius-lg);
+  background: #fff;
+  box-shadow: var(--iteach-shadow-modal);
+  overflow: hidden;
+}
+.rule-file-dialog header,
+.rule-file-dialog footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--iteach-border);
+}
+.rule-file-dialog footer {
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--iteach-border);
+  border-bottom: 0;
+}
+.rule-file-dialog h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.rule-record-body,
+.rule-upload-body {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  color: var(--iteach-text-secondary);
+  text-align: center;
+}
+.record-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 88px;
+  border-radius: var(--iteach-radius-md);
+  background: #f4fbf7;
+}
+.record-visual span {
+  width: 8px;
+  border-radius: 999px;
+  background: #41b883;
+}
+.record-visual span:nth-child(1) {
+  height: 24px;
+}
+.record-visual span:nth-child(2) {
+  height: 48px;
+}
+.record-visual span:nth-child(3) {
+  height: 34px;
+}
+.record-visual span:nth-child(4) {
+  height: 58px;
+}
+.rule-record-body strong {
+  color: var(--iteach-text-primary);
+}
+.video-upload-drop {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 150px;
+  border: 1px dashed var(--iteach-border-strong);
+  border-radius: var(--iteach-radius-md);
+  background: #fbfcff;
+}
+.video-upload-drop span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eaf4ff;
+  color: var(--iteach-blue-600);
+  font-size: 24px;
+}
+.video-upload-drop em {
+  color: var(--iteach-text-secondary);
+  font-size: 12px;
+  font-style: normal;
+}

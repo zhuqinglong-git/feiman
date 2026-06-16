@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>陈一诺 · 费曼报告 - 原型</title>
+    <link rel="stylesheet" href="../assets/styles.css?v=report-polish-20260615" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="iteach-sidebar">
+        <div class="sidebar-logo"><img src="../assets/iteach-logo.png" alt="iTeach小学工作台" /></div>
+        <nav class="iteach-nav" aria-label="主导航">
+          <div class="nav-group-title">云盘（课件管理）</div>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-folder-cloud"></span><span class="nav-label">集团云盘</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-drive"></span><span class="nav-label">校本云盘</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-cloud"></span><span class="nav-label">个人云盘</span></a>
+          <div class="nav-group-title">课后练习</div>
+          <a class="nav-row expanded" href="../index.html"><span class="tri"></span><span class="nav-icon icon-folder-check"></span><span class="nav-label">集团练习</span></a>
+          <a class="nav-row" href="../index.html"><span class="tri"></span><span class="nav-icon icon-screen-check"></span><span class="nav-label">校本练习</span></a>
+          <a class="nav-row" href="../index.html"><span class="tri"></span><span class="nav-icon icon-file-check"></span><span class="nav-label">个人练习</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-link"></span><span class="nav-label">绑定练习</span></a>
+          <a class="nav-row child active" href="class-detail.html"><span class="nav-icon icon-clipboard"></span><span class="nav-label">班级练习详情</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-book-stack"></span><span class="nav-label">小书童阅读详情</span></a>
+          <div class="nav-group-title">能力测评</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-report"></span><span class="nav-label">集团测评</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-check-square"></span><span class="nav-label">校本测评</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-chart"></span><span class="nav-label">成绩管理</span></a>
+          <div class="nav-group-title">素养打卡营</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-calendar-check"></span><span class="nav-label">活动列表</span></a>
+          <div class="nav-group-title">题库组卷</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-edit-square"></span><span class="nav-label">我要组卷</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-clipboard-list"></span><span class="nav-label">集团试卷</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-book-open"></span><span class="nav-label">校本试卷</span></a>
+        </nav>
+        <button class="recycle" type="button"><span class="nav-icon icon-trash"></span><span>回收站</span></button>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="breadcrumb"><a class="link" href="class-detail.html">班级练习详情</a> / 费曼练习 / 费曼报告</div>
+          <div class="user">四年级 2 班 · 林老师<span class="avatar" aria-label="当前用户">owl</span></div>
+        </header>
+
+        <section class="content">
+          <div class="page-header sticky-report-head">
+            <div>
+              <h1 class="page-title">陈一诺 · 费曼报告</h1>
+              <p class="page-desc">陈一诺的费曼报告详情与点评</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn" id="report-save-draft" type="button">保存点评</button>
+              <button class="btn primary" id="report-publish" type="button">发布报告</button>
+            </div>
+          </div>
+
+          <div class="report-three-layout single-student-report">
+            <div class="report-main">
+              <section class="panel report-part">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="panel-title" id="student-title">报告总览</h2>
+                    <p class="panel-desc">四年级 2 班 · 单位换算专题 · 2026-06-13 完成</p>
+                  </div>
+                  <span class="status waiting" id="report-status">待老师确认</span>
+                </div>
+                <div class="panel-body">
+                  <div class="metric-grid">
+                    <div class="metric editable-score"><span>综合评分</span><div class="score-stepper"><button data-score-target="phone-score" data-score-delta="-1" type="button">−</button><strong id="phone-score">92</strong><button data-score-target="phone-score" data-score-delta="1" type="button">+</button></div><em>AI 初评，老师可调整</em></div>
+                    <div class="metric editable-score"><span>知识准确性</span><div class="score-stepper"><button data-score-target="student-knowledge" data-score-delta="-1" type="button">−</button><strong id="student-knowledge">90</strong><button data-score-target="student-knowledge" data-score-delta="1" type="button">+</button></div><em>单位分类清楚</em></div>
+                    <div class="metric editable-score"><span>表达完整性</span><div class="score-stepper"><button data-score-target="student-expression" data-score-delta="-1" type="button">−</button><strong id="student-expression">94</strong><button data-score-target="student-expression" data-score-delta="1" type="button">+</button></div><em>换算步骤完整</em></div>
+                    <div class="metric"><span>报告结论</span><div class="result-edit"><strong>优秀</strong><button class="edit-icon" id="edit-report-result" type="button" aria-label="编辑报告结论">✎</button></div><em>可作为示范样本</em></div>
+                  </div>
+                  <div class="student-focus">
+                    <p id="student-ai-note">学生能先区分单位家族，再说明换算方向，建议继续巩固面积单位进率。</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel report-part">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="panel-title">1. 本次引用任务</h2>
+                    <p class="panel-desc">报告只追溯陈一诺本次作答所引用的试题、素材和判别依据。</p>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="task-ref-grid">
+                    <div class="source-card question-source">
+                      <div class="source-label">试题</div>
+                      <h3>请像小老师一样讲清：动物城单位换算秘籍怎么用？</h3>
+                      <p>陈一诺需要结合图片说明长度、质量、面积、人民币和时间五类单位家族，并示范大单位变小单位、小单位变大单位的换算方法。</p>
+                      <div class="tag-list"><span class="tag">数学</span><span class="tag">四年级</span><span class="tag">单位换算</span></div>
+                    </div>
+                    <div class="source-card media-source wide-media-source">
+                      <div class="source-label">学生看到的素材</div>
+                      <div class="media-strip">
+                        <div class="media-thumb image-thumb math-thumb"><img src="../assets/math-unit-conversion.png" alt="动物城单位换算秘籍" /><span>图片</span><strong>动物城单位换算秘籍</strong></div>
+                      </div>
+                    </div>
+                    <div class="source-card rule-source shifted-rule-source">
+                      <div class="source-label">本次评分依据</div>
+                      <div class="rule-points"><span>单位分类</span><span>换算方向</span><span>进率记忆</span><span>例题示范</span><span>追问补全</span></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel report-part">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="panel-title">2. 陈一诺的整体表现</h2>
+                    <p class="panel-desc">先看知识点，再看表情、语速、态度等作答状态。</p>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="knowledge-grid">
+                    <section class="knowledge-card good">
+                      <h3>掌握较好</h3>
+                      <strong>单位分类</strong>
+                      <p>能把长度、质量、面积、人民币和时间分成不同单位家族，未混用。</p>
+                    </section>
+                    <section class="knowledge-card missing">
+                      <h3>仍有遗漏</h3>
+                      <strong>面积进率</strong>
+                      <p>能记住面积单位相邻进率是 100，但解释原因时还不够主动。</p>
+                    </section>
+                    <section class="knowledge-card weak">
+                      <h3>待继续练习</h3>
+                      <strong>时间单位</strong>
+                      <p>时间和人民币不是 10 进制的普通长度法，需要继续单独记忆。</p>
+                    </section>
+                  </div>
+
+                  <div class="analysis-layout">
+                    <section class="dimension-board">
+                      <div class="section-subhead">
+                        <h3>费曼表现</h3>
+                      </div>
+                      <div class="dimension-radar" aria-label="陈一诺表情、语速、态度、专注、表达五维图">
+                        <span class="axis axis-top">表情 88</span>
+                        <span class="axis axis-right">语速 76</span>
+                        <span class="axis axis-bottom-right">态度 92</span>
+                        <span class="axis axis-bottom-left">专注 85</span>
+                        <span class="axis axis-left">表达 90</span>
+                        <div class="radar-core"></div>
+                      </div>
+                      <div class="dimension-bars">
+                        <div class="dimension-row"><span>表情自然度</span><div class="bar-track"><span class="bar-fill success width-88"></span></div><em>88</em></div>
+                        <div class="dimension-row"><span>语速稳定性</span><div class="bar-track"><span class="bar-fill warning width-66"></span></div><em>76</em></div>
+                        <div class="dimension-row"><span>学习态度</span><div class="bar-track"><span class="bar-fill success width-92"></span></div><em>92</em></div>
+                      </div>
+                    </section>
+                    <section>
+                      <div class="section-subhead">
+                        <h3>作答证据</h3>
+                      </div>
+                      <div class="evidence-list student-evidence-list">
+                        <div class="evidence">
+                          <div class="evidence-head"><strong>学生原话</strong><button class="link" id="open-original-audio" type="button">播放原始录音</button></div>
+                          <p class="quote" id="student-quote">“千米到米是大单位变小单位，要乘 1000，所以 2.45 千米等于 2450 米。”</p>
+                        </div>
+                        <div class="evidence">
+                          <div class="evidence-head"><strong>AI 点评</strong></div>
+                          <p class="quote">讲解顺序清晰，能先判断单位家族和换算方向；建议把面积相邻单位为什么是 100 倍讲得更完整。</p>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel report-part">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="panel-title">3. 老师点评</h2>
+                    <p class="panel-desc">老师给陈一诺补充一段个性化点评，可选择文字或语音。</p>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="teacher-comment-grid">
+                    <div class="field">
+                      <label>文字点评</label>
+                      <textarea id="teacher-note" rows="7">陈一诺这次讲得比较完整，能先分清单位家族，再判断大单位变小单位要乘、小单位变大单位要除。下次可以重点练习面积单位相邻进率 100，以及时间单位的特殊进率。</textarea>
+                    </div>
+                    <div class="field">
+                      <label>语音点评</label>
+                      <div class="voice-box">
+                        <p>录一段更亲切的个性化反馈，发布后学生和家长可播放。</p>
+                        <div class="voice-wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+                        <div class="voice-actions"><button class="btn" id="teacher-voice-record" type="button">录入语音</button></div>
+                      </div>
+                      <div class="voice-file-row" id="teacher-voice-file" hidden><span>老师语音点评 · 00:18</span><button class="link" id="play-teacher-voice" type="button">播放</button><button class="link" id="delete-teacher-voice" type="button">删除</button></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <aside class="report-side">
+              <section class="panel preview-panel">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="panel-title">小学堂预览</h2>
+                    <p class="panel-desc">当前学员会看到的报告卡片。</p>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="phone">
+                    <div class="phone-bar"></div>
+                    <div class="phone-content">
+                      <h3 class="phone-report-title" id="phone-student-name"><strong>陈一诺</strong><span>费曼报告</span></h3>
+                      <div class="phone-score"><strong id="phone-preview-score">优秀</strong><span>报告评分</span></div>
+                      <div class="phone-card preview-comment">
+                        <strong>整体表现</strong>
+                        <p><b>掌握较好：</b>能说清单位家族和“大变小用乘法”的方法。</p>
+                        <p><b>仍有遗漏：</b>面积单位相邻进率 100 的原因解释不够主动。</p>
+                        <p><b>待继续练习：</b>继续练习时间单位特殊进率。</p>
+                      </div>
+                      <div class="phone-card preview-dimensions">
+                        <strong>费曼表现</strong>
+                        <div class="phone-radar" aria-label="费曼表现五维图">
+                          <span class="phone-axis phone-axis-top">表情 88</span>
+                          <span class="phone-axis phone-axis-right">语速 76</span>
+                          <span class="phone-axis phone-axis-bottom-right">态度 92</span>
+                          <span class="phone-axis phone-axis-bottom-left">专注 85</span>
+                          <span class="phone-axis phone-axis-left">表达 90</span>
+                          <div class="phone-radar-core"></div>
+                        </div>
+                        <div class="mini-dimension-list">
+                          <span>表情自然度 <em>88</em></span>
+                          <span>语速稳定性 <em>76</em></span>
+                          <span>学习态度 <em>92</em></span>
+                        </div>
+                      </div>
+                      <div class="phone-card preview-teacher">
+                        <strong>费曼点评</strong>
+                        <p>陈一诺这次讲得比较完整，能先分清单位家族，再判断大单位变小单位要乘、小单位变大单位要除。下次可以重点练习面积单位相邻进率 100，以及时间单位的特殊进率。</p>
+                        <button class="phone-audio" type="button">播放语音点评</button>
+                      </div>
+                      <div class="phone-card preview-task">
+                        <strong>引用任务</strong>
+                        <p>单位换算专题：结合“动物城单位换算秘籍”讲清分类、方向、进率和例题。</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <section class="modal-layer report-dialog" id="original-audio-dialog" hidden>
+      <div class="report-modal wide">
+        <header><h2>原始作答录音</h2><button class="close-btn" id="close-original-audio" type="button">×</button></header>
+        <div class="chat-replay">
+          <div class="chat-row ai"><span>AI家长 00:08</span><p>你好！请问你是怎么知道换算联系方式的？</p></div>
+          <div class="chat-row student"><span>00:14 陈一诺</span><p>我先看单位家族，再看大单位还是小单位。</p></div>
+          <div class="chat-row ai"><span>AI家长 00:25</span><p>我们孩子学习也挺细致，方法一直没有大提升，我现在也比较头疼，正好你联系我了，想听听你的建议。</p></div>
+          <div class="chat-row student"><span>00:32 陈一诺</span><p>大单位变小单位要乘，小单位变大单位要除。</p></div>
+          <div class="chat-row ai"><span>AI家长 00:43</span><p>上课的老师是哪位？是在我的老师吗？</p></div>
+        </div>
+        <footer class="audio-player"><button class="play-dot" type="button">▶</button><div class="audio-track"><span></span></div><em>00:00 / 00:45</em></footer>
+      </div>
+    </section>
+
+    <section class="modal-layer report-dialog" id="teacher-record-dialog" hidden>
+      <div class="report-modal record">
+        <header><h2>录入语音点评</h2><button class="close-btn" id="close-teacher-record" type="button">×</button></header>
+        <div class="record-body">
+          <div class="record-circle">录音中</div>
+          <p>请录入给陈一诺和家长听的个性化点评。</p>
+          <div class="voice-wave active" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+        <footer><button class="btn" id="cancel-teacher-record" type="button">取消</button><button class="btn primary" id="finish-teacher-record" type="button">完成录制</button></footer>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="../assets/app.js"></script>
+  </body>
+</html>

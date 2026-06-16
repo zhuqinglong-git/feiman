@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>iTeach小学工作台 - 新建费曼练习</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="iteach-app">
+      <aside class="iteach-sidebar">
+        <div class="sidebar-logo"><img src="assets/iteach-logo.png" alt="iTeach小学工作台" /></div>
+        <nav class="iteach-nav" aria-label="主导航">
+          <div class="nav-group-title">云盘（课件管理）</div>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-folder-cloud"></span><span class="nav-label">集团云盘</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-drive"></span><span class="nav-label">校本云盘</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-cloud"></span><span class="nav-label">个人云盘</span></a>
+          <div class="nav-group-title">课后练习</div>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-folder-check"></span><span class="nav-label">集团练习</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-screen-check"></span><span class="nav-label">校本练习</span></a>
+          <a class="nav-row active" href="#"><span class="tri"></span><span class="nav-icon icon-file-check"></span><span class="nav-label">个人练习</span></a>
+          <a class="nav-row" href="#"><span class="tri"></span><span class="nav-icon icon-link"></span><span class="nav-label">绑定练习</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-clipboard"></span><span class="nav-label">班级练习详情</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-book-stack"></span><span class="nav-label">小书童阅读详情</span></a>
+          <div class="nav-group-title">能力测评</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-report"></span><span class="nav-label">集团测评</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-check-square"></span><span class="nav-label">校本测评</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-chart"></span><span class="nav-label">成绩管理</span></a>
+          <div class="nav-group-title">素养打卡营</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-calendar-check"></span><span class="nav-label">活动列表</span></a>
+          <div class="nav-group-title">题库组卷</div>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-edit-square"></span><span class="nav-label">我要组卷</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-clipboard-list"></span><span class="nav-label">集团试卷</span></a>
+          <a class="nav-row child" href="#"><span class="nav-icon icon-book-open"></span><span class="nav-label">校本试卷</span></a>
+        </nav>
+        <button class="recycle" type="button"><span class="nav-icon icon-trash"></span><span>回收站</span></button>
+      </aside>
+
+      <main class="iteach-main">
+        <div class="avatar" aria-label="当前用户">owl</div>
+        <section class="workspace">
+          <header class="workspace-head">
+            <h1>个人练习<span class="title-count">（共2个）</span></h1>
+            <div class="head-actions">
+              <label class="search" aria-label="搜索"><span>⌕</span><input placeholder="请输入关键词或练习ID" /></label>
+              <button class="btn" type="button">新建文件夹</button>
+              <div class="new-menu">
+                <button class="btn primary" id="new-practice-btn" type="button">新建练习</button>
+                <div class="menu-popover new-menu-popover">
+                  <button type="button">口语跟读</button>
+                  <button type="button">单词听写</button>
+                  <button type="button">主观题练习</button>
+                  <button type="button">作业包</button>
+                  <button id="new-feynman-entry" type="button">费曼练习</button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <section class="filter-panel">
+            <span class="filter-label">练习类型</span>
+            <button class="filter-chip active" type="button">全部</button>
+            <button class="filter-chip" type="button">口语跟读</button>
+            <button class="filter-chip" type="button">单词听写</button>
+            <button class="filter-chip" type="button">主观题练习</button>
+            <button class="filter-chip" type="button">作业包</button>
+            <button class="filter-more" type="button">更多筛选</button>
+          </section>
+
+          <div class="list-tools">
+            <button type="button">移动到</button>
+            <button type="button">复制到</button>
+            <button type="button">删除</button>
+          </div>
+
+          <section class="resource-table">
+            <table>
+              <colgroup>
+                <col class="col-select" />
+                <col class="col-name" />
+                <col class="col-type" />
+                <col class="col-count" />
+                <col class="col-count" />
+                <col class="col-creator" />
+                <col class="col-modified" />
+                <col class="col-actions" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="select-col"><span class="checkbox checked">−</span></th>
+                  <th>名称 ↑</th>
+                  <th>类型</th>
+                  <th>绑定次数</th>
+                  <th>复制次数</th>
+                  <th>创建人</th>
+                  <th>最近修改 ↓</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="checkbox"></span></td>
+                  <td><span class="resource-name"><span class="folder-icon"></span><span class="resource-text">背单词</span></span></td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>高冉</td>
+                  <td>张丹<br />2025-04-30 10:25:50</td>
+                  <td><button class="row-icon" type="button">⋯</button></td>
+                </tr>
+                <tr>
+                  <td><span class="checkbox checked">✓</span></td>
+                  <td><span class="resource-name"><span class="doc-icon"></span><span class="resource-text">A班-第二讲口语跟读练习4月30日</span></span></td>
+                  <td>口语跟读</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>高冉</td>
+                  <td>张丹<br />2025-04-30 10:25:50</td>
+                  <td><button class="row-icon" type="button">✎</button><button class="row-icon" type="button">⋯</button></td>
+                </tr>
+                <tr>
+                  <td><span class="checkbox checked">✓</span></td>
+                  <td><span class="resource-name"><span class="doc-icon"></span><span class="resource-text">声音是怎样传播的</span></span></td>
+                  <td>费曼练习</td>
+                  <td>3</td>
+                  <td>0</td>
+                  <td>林老师</td>
+                  <td>张丹<br />2026-06-14 10:36:00</td>
+                  <td><a class="link" href="pages/report.html">报告</a><button class="row-icon" type="button">⋯</button></td>
+                </tr>
+                <tr>
+                  <td><span class="checkbox"></span></td>
+                  <td><span class="resource-name"><span class="doc-icon"></span><span class="resource-text">第二讲课后资料</span></span></td>
+                  <td>PDF</td>
+                  <td>3</td>
+                  <td>0</td>
+                  <td>高冉</td>
+                  <td>张丹<br />2025-04-30 10:25:50</td>
+                  <td><button class="row-icon" type="button">✎</button><button class="row-icon" type="button">⋯</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <div class="pagination"><span>共 2 条</span><button type="button">‹</button><strong>1</strong><button type="button">›</button><select><option>30条/页</option></select></div>
+        </section>
+      </main>
+    </div>
+
+    <section class="modal-layer" id="name-dialog" hidden>
+      <div class="name-dialog">
+        <header><h2>新建练习</h2><button class="close-btn" id="close-name-dialog" type="button">×</button></header>
+        <textarea id="practice-name" rows="3" placeholder="请输入名称（必填）">声音是怎样传播的</textarea>
+        <footer><button class="btn" id="cancel-name" type="button">取消</button><button class="btn primary" id="confirm-name" type="button">确定</button></footer>
+      </div>
+    </section>
+
+    <section class="modal-layer full" id="creation-modal" hidden>
+      <div class="creation-modal">
+        <header class="creation-head">
+          <div class="creation-title"><span class="creation-icon">费</span><h2 id="creation-title">新建费曼练习-声音是怎样传播的</h2></div>
+          <button class="close-btn" id="close-creation-modal" type="button">×</button>
+        </header>
+
+        <div class="creation-body">
+          <aside class="creation-rail"><div class="source-tab active">基础信息</div><div class="source-tab">费曼内容</div><div class="source-tab">费曼规则</div><div class="source-tab">预览提交</div></aside>
+          <main class="creation-work">
+            <section class="section-panel">
+              <div class="section-head"><div><h2>基础信息</h2><p>用于在练习池中识别和后续复用。</p></div><span class="status draft">草稿</span></div>
+              <div class="section-body grid two">
+                <div class="field"><label>所属位置</label><select><option>个人练习 / 我的练习</option><option>校本练习 / TESS虚拟学校报名3</option></select></div>
+                <div class="field"><label>适配学科</label><select><option>科学素养</option><option>语文表达</option><option>数学思维</option></select></div>
+                <div class="field"><label>适配年级</label><select><option>小学三年级</option><option>小学二年级</option><option>小学四年级</option></select></div>
+                <div class="field"><label>讲次</label><select><option>第 06 讲：声音的秘密</option><option>第 05 讲：光和影子</option></select></div>
+              </div>
+            </section>
+
+            <section class="section-panel">
+              <div class="section-head">
+                <div><h2>费曼内容</h2><p>学生在小学堂小程序中看到的讲解材料。</p></div>
+                <div class="segment"><button class="active" data-content-type="question" type="button">题目</button><button data-content-type="image" type="button">图片</button><button data-content-type="video" type="button">视频</button></div>
+              </div>
+              <div class="section-body">
+                <div data-content-panel="question"><div class="field"><label>题目内容</label><textarea rows="4">为什么我们敲桌子时能听到声音？请你用自己的话讲给 AI 老师听。</textarea></div><div class="grid two compact-grid"><div class="field"><label>题目来源</label><select><option>手动录入</option><option>从题库引用</option></select></div><div class="field"><label>学生侧提示语</label><input value="请像小老师一样讲清楚你的想法" /></div></div></div>
+                <div data-content-panel="image" hidden><div class="upload-box"><strong>上传图片素材</strong><span>支持课堂照片、实验图、题目截图。</span><button class="btn" type="button">选择图片</button></div></div>
+                <div data-content-panel="video" hidden><div class="upload-box"><strong>上传视频素材</strong><span>支持课程片段、实验视频、老师示范讲解。</span><button class="btn" type="button">选择视频</button></div></div>
+              </div>
+            </section>
+
+            <section class="section-panel">
+              <div class="section-head"><div><h2>费曼规则</h2><p>AI 对练和费曼报告的判别依据。</p></div><span class="status waiting" id="rule-status">待确认</span></div>
+              <div class="rule-tabs"><button class="active" data-rule-tab="ai" type="button">对话生成规则</button><button data-rule-tab="bank" type="button">引用题库解析</button></div>
+              <div class="section-body">
+                <div class="rule-section active" data-rule-section="ai">
+                  <div class="rule-grid">
+                    <div class="rule-card"><h3>教师描述规则</h3><textarea id="rule-prompt" rows="8">希望 AI 先让学生解释声音怎么产生，再追问声音怎么传到耳朵里。如果学生只说“敲桌子有声音”，要继续追问声音和振动有什么关系。最后让学生举一个生活例子。</textarea><div class="record-line"><span>已录制 00:42</span><button class="link" type="button">重新录制</button><button class="link" type="button">上传视频</button></div><button class="btn primary" id="generate-rule" type="button">AI 提取规则</button></div>
+                    <div class="rule-card"><h3>AI 规则草稿</h3><div class="rule-output" id="ai-rule-output"><strong>待生成</strong><p>点击“AI 提取规则”后，系统会提取练习目标、追问策略、评分维度和报告依据。</p></div><div class="inline-actions"><button class="btn" type="button">反馈调整</button><button class="btn primary" id="confirm-ai-rule" type="button">确认规则</button></div></div>
+                  </div>
+                </div>
+                <div class="rule-section" data-rule-section="bank">
+                  <div class="bank-layout"><div class="bank-filter"><div class="field"><label>学科</label><select><option>科学素养</option></select></div><div class="field"><label>年级</label><select><option>小学三年级</option></select></div><div class="field"><label>关键词</label><input value="声音" /></div><button class="btn" type="button">搜索试题</button></div><div class="bank-result"><button class="question-row active" data-question="q1" type="button"><span>▣</span><strong>声音是怎样产生和传播的？</strong><em>科学素养 · 三年级 · 第 06 讲</em></button><button class="question-row" data-question="q2" type="button"><span>▣</span><strong>为什么物体会有影子？</strong><em>科学素养 · 二年级 · 第 05 讲</em></button><div class="analysis-card"><h3>引用答案解析</h3><p id="answer-analysis">答案解析：声音由物体振动产生，需要通过空气、水或固体等介质传播。学生需要说明振动来源，并能举出生活例子。</p><div class="inline-actions"><button class="btn" type="button">基于解析生成规则</button><button class="btn primary" id="confirm-bank-rule" type="button">确认引用</button></div></div></div></div>
+                </div>
+              </div>
+            </section>
+          </main>
+
+          <aside class="creation-side">
+            <section class="side-card"><h2>制作进度</h2><div class="step-list"><div class="step done" id="step-basic"><span>1</span><strong>基础信息</strong></div><div class="step done" id="step-content"><span>2</span><strong>费曼内容</strong></div><div class="step active" id="step-rule"><span>3</span><strong id="rule-check">待确认费曼规则</strong></div><div class="step" id="step-preview"><span>4</span><strong>预览提交</strong></div></div></section>
+            <section class="side-card"><h2>小学堂预览</h2><div class="phone"><div class="phone-bar"></div><div class="phone-content"><strong>声音是怎样传播的</strong><div class="phone-media" id="preview-media">题目内容</div><p>AI老师：请你像小老师一样，把这道题讲给我听。</p></div></div></section>
+          </aside>
+        </div>
+
+        <footer class="creation-footer"><span>当前为草稿，确认费曼规则后可提交质检</span><div class="inline-actions"><button class="btn" id="save-draft" type="button">保存草稿</button><button class="btn" id="preview-button" type="button">学生侧预览</button><button class="btn primary" id="publish-button" type="button">提交质检</button></div></footer>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status"></div>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
