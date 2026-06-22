@@ -1,17 +1,70 @@
 const state = {
-  contentType: "image",
+  activeSubject: "brain",
+  creationMode: "ai",
+  contentType: "question",
   imagePreviewSrc: "",
   imageUploaded: false,
   selectedImageName: "",
+  storyImageFile: true,
+  storyVideoFile: true,
   aiGenerated: false,
   ruleConfirmed: false,
   ruleInputMode: "text",
+  imageRuleFile: false,
   voiceRuleFile: false,
   videoRuleFile: false,
   bankRuleVideoFile: false,
+  isGeneratingRule: false,
+  ruleGenerationTimer: null,
+  ruleTypingTimer: null,
+  thinkingTypingTimer: null,
+  activeRuleOutput: null,
+  activeThinkingOutput: null,
   selectedQuestion: "q1",
   questionPickerOpen: false,
+  questionAdded: false,
 };
+
+const subjectLabels = {
+  brain: "脑力与思维",
+  bilingual: "双语故事表演",
+};
+
+const bankQuestions = [
+  {
+    label: "题1",
+    text: "一个长5dm、宽3dm、高5dm的长方体玻璃缸内盛有2dm深的水，放入一个石块后，水深2.2dm，这个石块的体积是多少？",
+    image: "assets/question-volume-water.png",
+    alt: "长方体玻璃缸水深变化题",
+  },
+  {
+    label: "题2",
+    text: "妈妈过生日，红红为妈妈准备了一份礼物。捆扎这个礼盒，如果接头处用去25厘米长的彩带，那么至少需要多长的彩带？",
+    image: "assets/question-gift-ribbon.png",
+    alt: "礼盒彩带长度题",
+  },
+];
+
+function getCreationVariant() {
+  if (state.creationMode === "teacher") return "teacher";
+  return state.activeSubject === "bilingual" ? "bilingual" : "brain";
+}
+
+const generatedRuleLines = [
+  "学生需要先按长度、质量、面积、人民币、时间五类单位家族进行分类说明。",
+  "AI 判断学生是否说清“大单位变小单位用乘法，小单位变大单位用除法”。",
+  "若学生混淆面积换算，AI 追问“为什么面积相邻单位之间通常是 100 倍”。",
+  "学生至少完成一个例题示范，例如 2.45 千米 = 2450 米或 1450 克 = 1.45 千克。",
+  "报告中按单位分类、进率记忆、换算方法、例题表达和追问应答五项评分。",
+];
+
+const bilingualRuleLines = [
+  "学生需要围绕老师布置的英语题目，用语音或视频讲清完整做题方法，而不是只给出选项答案。",
+  "AI 判断学生是否准确读出或复述题干关键信息，并说明题目考查的语法点、时态或固定搭配。",
+  "学生需要明确指出错误选项错在哪里，并解释为什么正确选项更符合句意和语法规则。",
+  "若学生只说答案、不讲原因，AI 追问“你是根据哪个关键词或语法结构判断的？”",
+  "报告中按题意理解、语法依据、错因分析、英文表达清晰度、追问应答五项评分，并给出老师后续讲评建议。",
+];
 
 function qs(selector) {
   return document.querySelector(selector);
@@ -45,10 +98,15 @@ function showToast(message) {
   showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
+function formatMessageTime(date = new Date()) {
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
 function openNameDialog() {
   const dialog = qs("#name-dialog");
   const input = qs("#practice-name");
   if (!dialog || !input) return;
+  input.value = getDefaultPracticeName();
   dialog.hidden = false;
   input.focus();
 }
@@ -58,15 +116,47 @@ function closeNameDialog() {
   if (dialog) dialog.hidden = true;
 }
 
+function setActiveSubject(subject) {
+  state.activeSubject = subject;
+  qsa("[data-subject-entry]").forEach((entry) => {
+    entry.classList.toggle("active", entry.dataset.subjectEntry === subject);
+  });
+  setText("#workspace-subject-label", subjectLabels[subject] || "脑力与思维");
+}
+
+function closeNewMenu() {
+  const menu = qs(".new-menu");
+  if (menu) menu.classList.remove("open");
+}
+
+function openFeynmanNameDialog(mode) {
+  state.creationMode = mode;
+  closeNewMenu();
+  openNameDialog();
+}
+
+function getDefaultPracticeName() {
+  if (state.creationMode === "ai" && state.activeSubject === "bilingual") return "双语知识点讲解";
+  return "动物城单位换算秘籍";
+}
+
+function getCreationTitleSuffix() {
+  const variant = getCreationVariant();
+  if (variant === "teacher") return "费曼练习(教师)";
+  if (variant === "bilingual") return "双语故事表演";
+  return "脑力与思维";
+}
+
 function openCreationModal() {
   const input = qs("#practice-name");
   const modal = qs("#creation-modal");
   if (!input || !modal) return;
-  const name = input.value.trim() || "未命名费曼练习";
-  setText("#creation-title", `新建费曼练习-${name}`);
+  const name = input.value.trim() || "未命名费曼任务";
+  setText("#creation-title", `新建费曼任务-${name}-${getCreationTitleSuffix()}`);
   closeNameDialog();
   modal.hidden = false;
-  showToast("已进入费曼练习创建");
+  applyCreationVariant();
+  showToast("已进入费曼任务创建");
 }
 
 function closeCreationModal() {
@@ -89,13 +179,166 @@ function toggleGroupPractice() {
   children.hidden = !willExpand;
 }
 
+function setHidden(selector, hidden) {
+  const element = qs(selector);
+  if (element) element.hidden = hidden;
+}
+
+function applyCreationVariant() {
+  const modal = qs("#creation-modal .creation-modal");
+  const variant = getCreationVariant();
+  const isBrain = variant === "brain";
+  const isTeacher = variant === "teacher";
+  const isStoryLike = variant === "bilingual" || isTeacher;
+  if (modal) {
+    modal.classList.toggle("variant-brain", isBrain);
+    modal.classList.toggle("variant-bilingual", variant === "bilingual");
+    modal.classList.toggle("variant-teacher", isTeacher);
+    modal.classList.toggle("no-rule", isBrain || isTeacher);
+  }
+
+  setHidden("#content-type-segment", true);
+  qsa("[data-content-type]").forEach((button) => {
+    button.hidden = isBrain || isStoryLike || button.dataset.contentType === "question";
+    button.classList.toggle("active", isBrain && button.dataset.contentType === "question");
+  });
+  setHidden("#shared-prompt-field", !isBrain);
+  setHidden("#story-content-dialog", !isStoryLike);
+  setHidden("#rule-section", isBrain || isTeacher);
+  setHidden("#rail-rule-tab", isBrain || isTeacher);
+  const footerText = qs("#preview-submit-section > span");
+  if (footerText) footerText.hidden = true;
+
+  qsa("[data-content-panel]").forEach((panel) => {
+    panel.hidden = !isBrain || panel.dataset.contentPanel !== "question";
+  });
+
+  if (isBrain) {
+    state.contentType = "question";
+    const source = qs("#question-source");
+    const promptInput = qs("#student-prompt-input");
+    if (source) source.value = "bank";
+    if (promptInput && !promptInput.dataset.brainInitialized) {
+      promptInput.value = "请完成下面题目，并讲讲你的思路和解题方法。";
+      promptInput.dataset.brainInitialized = "true";
+    }
+    updateQuestionStemCard();
+  }
+
+  if (variant === "bilingual") {
+    const storyInput = qs("#story-prompt-input");
+    const rulePrompt = qs("#rule-prompt");
+    state.storyImageFile = true;
+    state.storyVideoFile = true;
+    if (storyInput && !storyInput.dataset.bilingualInitialized) {
+      storyInput.value = "请根据老师布置的英语题目，用语音或视频讲清楚每道题的做题方法、判断依据，以及容易出错的地方。";
+      storyInput.dataset.bilingualInitialized = "true";
+    }
+    if (rulePrompt && !rulePrompt.dataset.bilingualInitialized) {
+      rulePrompt.value = "请围绕学生提交的英语题目讲解语音/视频，抽取一套费曼报告评分规则：重点判断学生是否讲清题意、语法依据、选项排除过程、错因分析和表达清晰度。";
+      rulePrompt.dataset.bilingualInitialized = "true";
+      updateSendButtonState();
+    }
+  }
+
+  scrollToCreationSection("content-section");
+  updateStoryAttachments();
+  updateStudentPreview();
+  updateQuestionPicker();
+}
+
+function getQuestionText() {
+  const input = qs("#question-content-input");
+  return input ? input.value.trim() : "";
+}
+
+function buildBankQuestionItems() {
+  return bankQuestions
+    .map(
+      (question) => `
+        <article class="bank-question-item">
+          <strong>${question.label}</strong>
+          <img src="${question.image}" alt="${question.alt}" />
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function updateQuestionStemCard() {
+  const card = qs("#question-stem-card");
+  const input = qs("#question-content-input");
+  if (!card) return;
+  if (!state.questionAdded) {
+    if (input) input.value = "";
+    card.classList.add("empty");
+    card.innerHTML = '<p>暂未选择题目，请点击“题库选题”添加题目。</p>';
+    return;
+  }
+  if (input) input.value = bankQuestions.map((question) => `${question.label}：${question.text}`).join("\n");
+  card.classList.remove("empty");
+  card.innerHTML = buildBankQuestionItems();
+}
+
+function buildQuestionStemPreview() {
+  if (!state.questionAdded) return '<span>暂未选择题目</span>';
+  return `
+    <article class="preview-question-card">
+      ${bankQuestions
+        .map(
+          (question) => `
+            <article class="bank-question-item text-only">
+              <strong>${question.label}</strong>
+              <p>${escapeHtml(question.text)}</p>
+              ${
+                question.label === "题2"
+                  ? '<img class="preview-question-figure" src="assets/question-gift-preview.png" alt="礼盒尺寸图" />'
+                  : ""
+              }
+            </article>
+          `,
+        )
+        .join("")}
+    </article>
+  `;
+}
+
+function buildStoryPreview() {
+  const parts = [];
+  if (state.storyImageFile) {
+    parts.push('<div class="preview-story-file image"><img src="assets/bilingual-assignment.png" alt="双语故事表演布置作业截图" /><strong>布置作业截图</strong></div>');
+  }
+  if (state.storyVideoFile) {
+    parts.push('<div class="preview-story-file video"><span>▶</span><strong>学员作答视频.mp4</strong></div>');
+  }
+  if (!parts.length) return '<span>暂未添加图片或视频</span>';
+  return `<div class="preview-story-files">${parts.join("")}</div>`;
+}
+
 function updateStudentPreview() {
   const promptInput = qs("#student-prompt-input");
   const questionInput = qs("#question-content-input");
+  const storyInput = qs("#story-prompt-input");
   const prompt = qs("#preview-prompt");
   const preview = qs("#preview-media");
-  if (prompt) prompt.textContent = promptInput ? promptInput.value : "";
   if (!preview) return;
+  const variant = getCreationVariant();
+
+  if (variant === "brain") {
+    if (prompt) prompt.textContent = promptInput ? promptInput.value : "请完成下面题目，并讲讲你的思路和解题方法。";
+    preview.className = `practice-material question${state.questionAdded ? "" : " empty"}`;
+    preview.innerHTML = buildQuestionStemPreview();
+    return;
+  }
+
+  if (variant === "bilingual" || variant === "teacher") {
+    if (prompt) prompt.textContent = storyInput ? storyInput.value : "";
+    preview.className = `practice-material story${state.storyImageFile || state.storyVideoFile ? "" : " empty"}`;
+    preview.innerHTML = buildStoryPreview();
+    return;
+  }
+
+  if (prompt) prompt.textContent = promptInput ? promptInput.value : "";
 
   preview.className = `practice-material ${state.contentType}`;
   preview.innerHTML = "";
@@ -145,30 +388,48 @@ function updateQuestionPicker() {
   const source = qs("#question-source");
   const picker = qs("[data-question-picker]");
   const modal = qs("#creation-modal .creation-modal");
-  const showPicker = state.contentType === "question" && source && source.value === "bank" && state.questionPickerOpen;
+  const showPicker = getCreationVariant() === "brain" && state.contentType === "question" && source && source.value === "bank" && state.questionPickerOpen;
   if (picker) picker.hidden = !showPicker;
   if (modal) modal.classList.toggle("question-picker-mode", showPicker);
   updateBankRuleVideo();
 }
 
 function updateBankRuleVideo() {
-  const source = qs("#question-source");
-  const showVideo = state.contentType === "question" && source && source.value === "bank";
-  state.bankRuleVideoFile = showVideo;
-  if (showVideo) state.ruleInputMode = "video";
+  state.bankRuleVideoFile = false;
   updateRuleInputFiles();
 }
 
 function confirmQuestionFromBank() {
   const source = qs("#question-source");
   if (source) source.value = "bank";
+  state.questionAdded = true;
   state.questionPickerOpen = false;
+  updateQuestionStemCard();
+  updateStudentPreview();
   updateQuestionPicker();
   showToast("从题库中引用试题成功");
 }
 
+function handleQuestionPickerClick(event) {
+  if (event.target.closest(".picker-footer .primary")) {
+    confirmQuestionFromBank();
+    return;
+  }
+  if (event.target.closest(".picker-footer button, .picker-head button")) {
+    state.questionPickerOpen = false;
+    updateQuestionPicker();
+  }
+}
+
 function handleQuestionSourceChange(event) {
-  state.questionPickerOpen = event.target.value === "bank";
+  state.questionPickerOpen = false;
+  updateQuestionPicker();
+}
+
+function openQuestionPicker() {
+  const source = qs("#question-source");
+  if (source) source.value = "bank";
+  state.questionPickerOpen = true;
   updateQuestionPicker();
 }
 
@@ -223,6 +484,40 @@ function uploadSelectedImage() {
   showToast("图片已上传");
 }
 
+function updateStoryAttachments() {
+  const imageFile = qs("#story-image-file");
+  const videoFile = qs("#story-video-file");
+  const list = qs("#story-attachment-list");
+  if (imageFile) imageFile.hidden = !state.storyImageFile;
+  if (videoFile) videoFile.hidden = !state.storyVideoFile;
+  if (list) list.hidden = !(state.storyImageFile || state.storyVideoFile);
+  updateStudentPreview();
+}
+
+function addStoryImage() {
+  state.storyImageFile = true;
+  updateStoryAttachments();
+  showToast("图片已添加到费曼内容");
+}
+
+function addStoryVideo() {
+  state.storyVideoFile = true;
+  updateStoryAttachments();
+  showToast("视频已添加到费曼内容");
+}
+
+function deleteStoryImage() {
+  state.storyImageFile = false;
+  updateStoryAttachments();
+  showToast("已删除图片");
+}
+
+function deleteStoryVideo() {
+  state.storyVideoFile = false;
+  updateStoryAttachments();
+  showToast("已删除视频");
+}
+
 function setDialogHidden(selector, hidden) {
   const dialog = qs(selector);
   if (dialog) dialog.hidden = hidden;
@@ -252,19 +547,39 @@ function openVideoUploadDialog() {
   setDialogHidden("#video-upload-dialog", false);
 }
 
+function openRuleImageDialog() {
+  setDialogHidden("#image-upload-dialog", false);
+}
+
+function closeRuleImageDialog() {
+  setDialogHidden("#image-upload-dialog", true);
+}
+
 function closeVideoUploadDialog() {
   setDialogHidden("#video-upload-dialog", true);
 }
 
 function updateRuleInputFiles() {
+  const imageFile = qs("#rule-image-file");
   const voiceFile = qs("#rule-voice-file");
   const videoFile = qs("#rule-video-file");
   const bankVideoFile = qs("#bank-rule-video-file");
+  const attachmentList = qs("#rule-attachment-list");
+  if (imageFile) imageFile.hidden = !state.imageRuleFile;
   if (voiceFile) voiceFile.hidden = !state.voiceRuleFile;
   if (videoFile) videoFile.hidden = !state.videoRuleFile;
   if (bankVideoFile) bankVideoFile.hidden = !state.bankRuleVideoFile;
-  setText("#rule-video-source-title", state.bankRuleVideoFile ? "通过题库获取讲解视频" : "上传视频录入");
-  setText("#rule-video-source-desc", state.bankRuleVideoFile ? "已自动带入题库讲解视频" : "上传讲解或示范视频");
+  if (attachmentList) attachmentList.hidden = !(state.imageRuleFile || state.voiceRuleFile || state.videoRuleFile || state.bankRuleVideoFile);
+  setText("#rule-video-source-title", "上传视频");
+  updateSendButtonState();
+}
+
+function finishRuleImageUpload() {
+  state.imageRuleFile = true;
+  closeRuleImageDialog();
+  updateRuleInputFiles();
+  updateSendButtonState();
+  showToast("图片附件已添加");
 }
 
 function finishVoiceRecord() {
@@ -272,6 +587,7 @@ function finishVoiceRecord() {
   state.ruleInputMode = "voice";
   closeVoiceRecordDialog();
   updateRuleInputFiles();
+  updateSendButtonState();
   showToast("录音文件已生成");
 }
 
@@ -280,6 +596,7 @@ function finishVideoUpload() {
   state.ruleInputMode = "video";
   closeVideoUploadDialog();
   updateRuleInputFiles();
+  updateSendButtonState();
   showToast("视频文件已上传");
 }
 
@@ -287,13 +604,22 @@ function deleteVoiceRuleFile() {
   state.voiceRuleFile = false;
   if (state.ruleInputMode === "voice") state.ruleInputMode = state.videoRuleFile ? "video" : "text";
   updateRuleInputFiles();
+  updateSendButtonState();
   showToast("已删除录音文件");
+}
+
+function deleteRuleImageFile() {
+  state.imageRuleFile = false;
+  updateRuleInputFiles();
+  updateSendButtonState();
+  showToast("已删除图片附件");
 }
 
 function deleteVideoRuleFile() {
   state.videoRuleFile = false;
   if (state.ruleInputMode === "video") state.ruleInputMode = state.voiceRuleFile ? "voice" : "text";
   updateRuleInputFiles();
+  updateSendButtonState();
   showToast("已删除视频文件");
 }
 
@@ -303,13 +629,156 @@ function deleteBankRuleVideoFile() {
   if (source && source.value === "bank") source.value = "manual";
   if (state.ruleInputMode === "video") state.ruleInputMode = state.videoRuleFile ? "video" : state.voiceRuleFile ? "voice" : "text";
   updateRuleInputFiles();
+  updateSendButtonState();
   showToast("已删除题库讲解视频");
 }
 
-function getRuleRequestText() {
-  if (state.ruleInputMode === "voice" && state.voiceRuleFile) return "请根据录音文件生成费曼规则";
-  if (state.ruleInputMode === "video" && (state.videoRuleFile || state.bankRuleVideoFile)) return "请根据视频文件生成费曼规则";
-  return "请根据输入的文字生成费曼规则";
+function getRulePromptText() {
+  const prompt = qs("#rule-prompt");
+  return prompt ? prompt.value.trim() : "";
+}
+
+function getRuleMessageAttachments() {
+  const attachments = [];
+  if (state.imageRuleFile) attachments.push({ type: "image", label: "规则说明图片.png", icon: "图" });
+  if (state.voiceRuleFile) attachments.push({ type: "voice", label: "单位换算规则录音.m4a", icon: "音" });
+  if (state.videoRuleFile) attachments.push({ type: "video", label: "单位换算规则说明.mp4", icon: "视" });
+  if (state.bankRuleVideoFile) attachments.push({ type: "video", label: "题库讲解视频.mp4", icon: "视" });
+  return attachments;
+}
+
+function getCurrentGeneratedRuleLines() {
+  return getCreationVariant() === "bilingual" ? bilingualRuleLines : generatedRuleLines;
+}
+
+function clearRuleInputAttachments() {
+  state.imageRuleFile = false;
+  state.voiceRuleFile = false;
+  state.videoRuleFile = false;
+  state.bankRuleVideoFile = false;
+  state.ruleInputMode = "text";
+  updateRuleInputFiles();
+}
+
+function hasRuleInputContent() {
+  return Boolean(getRulePromptText() || getRuleMessageAttachments().length);
+}
+
+function extractRewriteRule(text) {
+  if (!text.includes("修改")) return "";
+  const bracketMatch = text.match(/【([^】]+)】/);
+  return bracketMatch ? bracketMatch[1].trim() : "";
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[char]);
+}
+
+function buildMessageBubbleHtml(content) {
+  return `<div class="rule-message-bubble"><div class="rule-message-content">${content}</div></div>`;
+}
+
+function buildTeacherMessageHtml(text, attachments) {
+  const content = text ? `<p>${escapeHtml(text).replace(/\n/g, "<br />")}</p>` : "";
+  const files = attachments
+    .map(
+      (file) => `
+        <div class="sent-attachment ${file.type}">
+          <span>${file.icon}</span>
+          <strong>${file.label}</strong>
+        </div>
+      `,
+    )
+    .join("");
+  return buildMessageBubbleHtml(`${content}${files ? `<div class="sent-attachments">${files}</div>` : ""}`);
+}
+
+function ensureMessageMeta(message) {
+  if (!message || message.querySelector(".rule-message-meta")) return;
+  const bubble = message.querySelector(".rule-message-bubble");
+  if (!bubble) return;
+  const meta = document.createElement("div");
+  meta.className = "rule-message-meta";
+  meta.innerHTML = `<span>${formatMessageTime()}</span><button class="copy-ai-message" type="button" aria-label="复制">⧉</button>`;
+  bubble.appendChild(meta);
+}
+
+function appendRuleMessage(role, html, beforeElement) {
+  const chat = qs(".rule-chat-zone");
+  if (!chat) return null;
+  const message = document.createElement("div");
+  message.className = `rule-message ${role}`;
+  message.innerHTML = html;
+  ensureMessageMeta(message);
+  chat.insertBefore(message, beforeElement || null);
+  chat.scrollTop = chat.scrollHeight;
+  return message;
+}
+
+function copyTextToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast("已复制")).catch(() => showToast("复制失败"));
+    return;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  showToast(copied ? "已复制" : "复制失败");
+}
+
+function copyAiMessage(event) {
+  const button = event.target.closest(".copy-ai-message");
+  if (!button) return;
+  const bubble = button.closest(".rule-message-bubble");
+  if (!bubble) return;
+  const content = bubble.querySelector(".rule-message-content");
+  copyTextToClipboard((content || bubble).textContent.trim());
+}
+
+function hydrateMessageMeta() {
+  qsa(".rule-message").forEach((message) => {
+    const bubble = message.querySelector(".rule-message-bubble");
+    if (bubble && !bubble.querySelector(".rule-message-content")) {
+      const fragment = document.createElement("div");
+      fragment.className = "rule-message-content";
+      while (bubble.firstChild) fragment.appendChild(bubble.firstChild);
+      bubble.appendChild(fragment);
+    }
+    ensureMessageMeta(message);
+  });
+}
+
+function sendRuleMessage() {
+  if (state.isGeneratingRule) {
+    stopRuleGeneration();
+    return;
+  }
+  const prompt = qs("#rule-prompt");
+  const text = getRulePromptText();
+  const attachments = getRuleMessageAttachments();
+  if (!text && !attachments.length) {
+    showToast("请先输入内容再发送");
+    return;
+  }
+  appendRuleMessage("teacher", buildTeacherMessageHtml(text, attachments));
+  state.ruleInputMode = state.voiceRuleFile ? "voice" : state.videoRuleFile || state.bankRuleVideoFile ? "video" : "text";
+  if (prompt) prompt.value = "";
+  clearRuleInputAttachments();
+  updateSendButtonState();
+  startRuleGenerationFlow(extractRewriteRule(text));
+  showToast("已发送到对话区域");
+}
+
+function handleRulePromptKeydown(event) {
+  if (event.key !== "Enter" || event.shiftKey) return;
+  event.preventDefault();
+  sendRuleMessage();
 }
 
 function autoResizeTextarea(textarea) {
@@ -324,67 +793,121 @@ function autoResizeRuleDimensions() {
   });
 }
 
-function generateRule() {
-  const output = qs("#ai-rule-output");
-  if (!output) return;
-  const requestWrap = qs("#rule-generation-request-wrap");
-  const request = qs("#rule-generation-request");
-  const reply = qs("#rule-generated-reply");
-  const generateButton = qs("#generate-rule");
-  const generatedActions = qs("#rule-generated-actions");
-  const prompt = qs("#rule-prompt");
-  if (prompt && document.activeElement === prompt) state.ruleInputMode = "text";
-  if (request) request.textContent = getRuleRequestText();
-  if (requestWrap) requestWrap.hidden = false;
-  if (reply) reply.hidden = false;
-  output.innerHTML = `
-    <div class="rule-dimension">
-      <div class="rule-dimension-title">维度1：费曼内容检查策略</div>
-      <textarea rows="8">学生需要先按长度、质量、面积、人民币、时间五类单位家族进行分类说明。
-AI 判断学生是否说清“大单位变小单位用乘法，小单位变大单位用除法”。
-若学生混淆面积换算，AI 追问“为什么面积相邻单位之间通常是 100 倍”。
-学生至少完成一个例题示范，例如 2.45 千米 = 2450 米或 1450 克 = 1.45 千克。
-报告中按单位分类、进率记忆、换算方法、例题表达和追问应答五项评分。</textarea>
-    </div>
-    <div class="rule-dimension">
-      <div class="rule-dimension-title">维度2：AI 对练追问策略</div>
-      <textarea rows="6">AI 先用开放问题让学生自由讲解，再根据回答选择追问路径：如果学生只背口诀，继续追问“为什么这样换算”；如果学生漏掉单位家族，先要求分类；如果学生能说出方法，则引导其用生活场景举例说明。</textarea>
-    </div>
-    <div class="rule-dimension">
-      <div class="rule-dimension-title">维度3：报告评价与老师跟进</div>
-      <textarea rows="6">报告按知识掌握、表达清晰度、纠错能力三个方向展示结果。对薄弱学生标记需要老师跟进的知识点，并给出下一次练习建议，例如重点复习面积单位进率、时间单位进率或小数点移动规则。</textarea>
-    </div>
-  `;
+function finishRuleGeneration() {
+  window.clearTimeout(state.ruleTypingTimer);
+  state.ruleTypingTimer = null;
+  state.isGeneratingRule = false;
+  const output = state.activeRuleOutput;
+  if (output) {
+    const streamOutput = output.querySelector(".stream-rule-text");
+    if (streamOutput) {
+      const editable = document.createElement("textarea");
+      editable.className = "editable-rule-output";
+      editable.value = streamOutput.textContent;
+      streamOutput.replaceWith(editable);
+      autoResizeTextarea(editable);
+      editable.addEventListener("input", () => autoResizeTextarea(editable));
+    }
+  }
+  setSendButtonGenerating(false);
   state.aiGenerated = true;
-  state.ruleConfirmed = false;
-  if (generateButton) generateButton.hidden = true;
-  if (generatedActions) generatedActions.hidden = false;
-  autoResizeRuleDimensions();
+  state.ruleConfirmed = true;
   updateRuleState();
-  showToast("AI 已生成规则草稿，请检查后确认");
+  showToast("AI 已生成费曼规则");
+}
+
+function typeText(output, text, index, onDone) {
+  if (!state.isGeneratingRule) return;
+  output.textContent = text.slice(0, index);
+  const chat = qs(".rule-chat-zone");
+  if (chat) chat.scrollTop = chat.scrollHeight;
+  if (index >= text.length) {
+    if (onDone) onDone();
+    return;
+  }
+  return window.setTimeout(() => typeText(output, text, index + 1, onDone), 24);
+}
+
+function typeRuleText(output, text) {
+  state.ruleTypingTimer = typeText(output, text, 0, finishRuleGeneration);
+}
+
+function typeThinkingText(output, text) {
+  state.thinkingTypingTimer = typeText(output, text, 0, null);
+}
+
+function setSendButtonGenerating(isGenerating) {
+  const button = qs("#send-rule-message");
+  if (!button) return;
+  button.textContent = isGenerating ? "停止" : "↑";
+  button.classList.toggle("is-stopping", isGenerating);
+  button.setAttribute("aria-label", isGenerating ? "停止输出" : "发送");
+  if (!isGenerating) updateSendButtonState();
+}
+
+function updateSendButtonState() {
+  const button = qs("#send-rule-message");
+  if (!button || state.isGeneratingRule) return;
+  button.classList.toggle("is-disabled", !hasRuleInputContent());
+}
+
+function stopRuleGeneration() {
+  const output = state.activeRuleOutput;
+  window.clearTimeout(state.ruleGenerationTimer);
+  window.clearTimeout(state.ruleTypingTimer);
+  window.clearTimeout(state.thinkingTypingTimer);
+  state.ruleGenerationTimer = null;
+  state.ruleTypingTimer = null;
+  state.thinkingTypingTimer = null;
+  state.isGeneratingRule = false;
+  if (output) output.innerHTML = "<p>已停止输出，可继续补充需求后再次生成。</p>";
+  setSendButtonGenerating(false);
+  updateRuleState();
+  showToast("已停止输出");
+}
+
+function startRuleGenerationFlow(rewriteRule = "") {
+  if (state.isGeneratingRule) {
+    stopRuleGeneration();
+    return;
+  }
+  const thinking = appendRuleMessage("ai", buildMessageBubbleHtml('<span class="thinking-stream"></span>'));
+  const thinkingOutput = thinking ? thinking.querySelector(".thinking-stream") : null;
+  const reply = appendRuleMessage("ai", buildMessageBubbleHtml('<div class="generated-rule-output"><p>正在思考...</p></div>'));
+  const output = reply ? reply.querySelector(".generated-rule-output") : null;
+  if (!output) return;
+  state.activeRuleOutput = output;
+  state.activeThinkingOutput = thinkingOutput;
+  state.aiGenerated = false;
+  state.ruleConfirmed = false;
+  state.isGeneratingRule = true;
+  setSendButtonGenerating(true);
+  updateRuleState();
+  state.thinkingTypingTimer = window.setTimeout(() => {
+    if (thinkingOutput) typeThinkingText(thinkingOutput, "收到您输入的信息，接下来我将进行思考，抽取成可用的费曼规则...");
+  }, 500);
+  state.ruleGenerationTimer = window.setTimeout(() => {
+    state.ruleGenerationTimer = null;
+    const text = rewriteRule ? rewriteRule : getCurrentGeneratedRuleLines().map((line, index) => `${index + 1}. ${line}`).join("\n");
+    const title = rewriteRule ? "收到，我将按照您的规则进行执行，费曼规则如下：" : "思考完毕，整理费曼规则如下：";
+    output.innerHTML = `<div class="rule-dimension-title">${title}</div><pre class="stream-rule-text"></pre>`;
+    const streamOutput = output.querySelector(".stream-rule-text");
+    if (streamOutput) typeRuleText(streamOutput, text);
+  }, 2000);
 }
 
 function confirmRule() {
-  if (!state.aiGenerated) {
-    showToast("请先生成规则草稿");
-    return;
-  }
-  state.ruleConfirmed = true;
-  updateRuleState();
-  showToast("费曼规则已确认");
+  stopRuleGeneration();
 }
 
 function updateRuleState() {
-  if (!qs("#rule-status")) return;
-  setText("#rule-status", state.ruleConfirmed ? "已确认" : "待确认");
-  setClass("#rule-status", state.ruleConfirmed ? "status ready" : "status waiting");
-
   const publishButton = qs("#publish-button");
-  if (publishButton) publishButton.disabled = !state.ruleConfirmed;
+  if (publishButton) publishButton.disabled = false;
 }
 
 function scrollToCreationSection(sectionId) {
   const target = qs(`#${sectionId}`);
+  if (target && target.hidden) return;
   if (!target) return;
   target.scrollIntoView({ behavior: "smooth", block: "start" });
   qsa("[data-anchor-target]").forEach((button) => button.classList.toggle("active", button.dataset.anchorTarget === sectionId));
@@ -432,33 +955,44 @@ function deleteTeacherVoiceRecord() {
 function bindTemplateEvents() {
   on("#group-practice-toggle", "click", toggleGroupPractice);
   on("#new-practice-btn", "click", toggleNewMenu);
-  on("#new-feynman-entry", "click", () => {
-    const menu = qs(".new-menu");
-    if (menu) menu.classList.remove("open");
-    openNameDialog();
-  });
+  on("#new-feynman-ai-entry", "click", () => openFeynmanNameDialog("ai"));
+  on("#new-feynman-teacher-entry", "click", () => openFeynmanNameDialog("teacher"));
   on("#close-name-dialog", "click", closeNameDialog);
   on("#cancel-name", "click", closeNameDialog);
   on("#confirm-name", "click", openCreationModal);
   on("#close-creation-modal", "click", closeCreationModal);
-  on("#generate-rule", "click", generateRule);
-  on("#regenerate-rule", "click", generateRule);
-  on("#confirm-ai-rule", "click", confirmRule);
-  on("#save-draft", "click", () => showToast("已保存为草稿"));
+  on("#save-draft", "click", () => {
+    showToast("已取消创建");
+    closeCreationModal();
+  });
   on("#publish-button", "click", () => {
-    showToast("费曼练习已完成创建");
+    showToast("费曼任务已完成创建");
     closeCreationModal();
   });
   on("#question-source", "change", handleQuestionSourceChange);
-  on("[data-question-picker]", "click", confirmQuestionFromBank);
+  on("#open-question-picker", "click", openQuestionPicker);
+  on("[data-question-picker]", "click", handleQuestionPickerClick);
   on("#student-prompt-input", "input", updateStudentPreview);
   on("#question-content-input", "input", updateStudentPreview);
+  on("#story-prompt-input", "input", updateStudentPreview);
+  on("#story-image-upload", "click", addStoryImage);
+  on("#story-video-upload", "click", addStoryVideo);
+  on("#preview-story-image", "click", () => showToast("正在预览布置作业截图"));
+  on("#play-story-video", "click", () => showToast("正在播放学员作答视频"));
+  on("#delete-story-image", "click", deleteStoryImage);
+  on("#delete-story-video", "click", deleteStoryVideo);
   on("#rule-prompt", "focus", () => {
     state.ruleInputMode = "text";
   });
   on("#rule-prompt", "input", () => {
     state.ruleInputMode = "text";
+    updateSendButtonState();
   });
+  on("#rule-prompt", "keydown", handleRulePromptKeydown);
+  on("#rule-image-upload", "click", openRuleImageDialog);
+  on("#close-image-dialog", "click", closeRuleImageDialog);
+  on("#cancel-rule-image", "click", closeRuleImageDialog);
+  on("#finish-rule-image", "click", finishRuleImageUpload);
   on("#rule-voice-record", "click", openVoiceRecordDialog);
   on("#rule-video-upload", "click", openVideoUploadDialog);
   on("#close-voice-dialog", "click", closeVoiceRecordDialog);
@@ -467,6 +1001,14 @@ function bindTemplateEvents() {
   on("#close-video-dialog", "click", closeVideoUploadDialog);
   on("#cancel-video-upload", "click", closeVideoUploadDialog);
   on("#finish-video-upload", "click", finishVideoUpload);
+  on("#send-rule-message", "click", sendRuleMessage);
+  const ruleChat = qs(".rule-chat-zone");
+  if (ruleChat) ruleChat.addEventListener("click", copyAiMessage);
+  on("#preview-rule-image", "click", () => showToast("正在预览图片附件"));
+  on("#play-rule-voice", "click", () => showToast("正在播放录音文件"));
+  on("#play-rule-video", "click", () => showToast("正在播放视频文件"));
+  on("#play-bank-rule-video", "click", () => showToast("正在播放题库讲解视频"));
+  on("#delete-rule-image", "click", deleteRuleImageFile);
   on("#delete-rule-voice", "click", deleteVoiceRuleFile);
   on("#delete-rule-video", "click", deleteVideoRuleFile);
   on("#delete-bank-rule-video", "click", deleteBankRuleVideoFile);
@@ -476,13 +1018,18 @@ function bindTemplateEvents() {
   const imageInput = qs("#image-file-input");
   if (imageInput) imageInput.addEventListener("change", handleImageSelected);
 
+  qsa("[data-subject-entry]").forEach((entry) => {
+    entry.addEventListener("click", (event) => {
+      event.preventDefault();
+      setActiveSubject(entry.dataset.subjectEntry);
+    });
+  });
   qsa("[data-content-type]").forEach((button) => button.addEventListener("click", () => setContentType(button.dataset.contentType)));
   qsa("[data-question]").forEach((button) => button.addEventListener("click", () => selectQuestion(button.dataset.question)));
   qsa("[data-anchor-target]").forEach((button) => button.addEventListener("click", () => scrollToCreationSection(button.dataset.anchorTarget)));
 }
 
 function bindReportEvents() {
-  on("#report-save-draft", "click", () => showToast("审核意见已保存"));
   on("#report-publish", "click", () => {
     setReportPublished(true);
     showToast("报告已发布给家长");
@@ -501,12 +1048,16 @@ function bindReportEvents() {
 
 document.addEventListener("DOMContentLoaded", () => {
   bindTemplateEvents();
+  hydrateMessageMeta();
   bindReportEvents();
+  setActiveSubject(state.activeSubject);
   if (qsa("[data-content-type]").length) setContentType(state.contentType);
+  applyCreationVariant();
   updateQuestionPicker();
   if (qsa("[data-question]").length) selectQuestion(state.selectedQuestion);
   updateImageUploadState();
   updateRuleInputFiles();
   updateRuleState();
+  updateSendButtonState();
   if (qs("#report-status")) setReportPublished(false);
 });
