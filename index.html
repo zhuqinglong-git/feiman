@@ -3,12 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>iTeach小学工作台 - 新建费曼练习</title>
+    <title>iTeach小学工作台 - 新建费曼任务</title>
     <link rel="stylesheet" href="assets/styles.css" />
     <link rel="stylesheet" href="assets/question-picker.css" />
     <link rel="stylesheet" href="assets/image-upload.css" />
     <link rel="stylesheet" href="assets/rule-dialog.css" />
     <link rel="stylesheet" href="assets/student-preview.css" />
+    <link rel="stylesheet" href="assets/creation-variants.css" />
   </head>
   <body>
     <div class="iteach-app">
@@ -24,11 +25,11 @@
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">创客</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">机器人</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">美术</span></a>
-            <a class="nav-row folder-child active" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">脑力与思维</span></a>
+            <a class="nav-row folder-child active" href="#" data-subject-entry="brain"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">脑力与思维</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">思辨与口才</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">书法</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">数学</span></a>
-            <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">双语故事表演</span></a>
+            <a class="nav-row folder-child" href="#" data-subject-entry="bilingual"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">双语故事表演</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">虚拟学科</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">语文</span></a>
             <a class="nav-row folder-child" href="#"><span class="tri"></span><span class="folder-dot"></span><span class="nav-label">英语</span></a>
@@ -46,7 +47,7 @@
         <section class="workspace">
           <header class="workspace-head">
             <div class="path-tools">
-              <div class="workspace-path"><button class="back-link" type="button">← 返回</button><span>集团练习</span><span>脑力与思维</span><span>0.FY26</span><span>1.夏</span><span>B体系</span><span>L4-B</span><strong>第2章-和差倍综合<span class="title-count">（共3个）</span></strong></div>
+              <div class="workspace-path"><button class="back-link" type="button">← 返回</button><span>集团练习</span><span id="workspace-subject-label">脑力与思维</span><span>0.FY26</span><span>1.夏</span><span>B体系</span><span>L4-B</span><strong>第2章-和差倍综合<span class="title-count">（共3个）</span></strong></div>
               <div class="list-tools"><button type="button">移动</button><button type="button">复制</button><button type="button">删除</button></div>
             </div>
             <div class="head-actions">
@@ -59,7 +60,8 @@
                   <button type="button">单词听写</button>
                   <button type="button">主观题练习</button>
                   <button type="button">作业包</button>
-                  <button id="new-feynman-entry" type="button">费曼练习</button>
+                  <button id="new-feynman-ai-entry" type="button">费曼任务(AI)</button>
+                  <button id="new-feynman-teacher-entry" type="button">费曼任务(真人)</button>
                 </div>
               </div>
             </div>
@@ -139,14 +141,14 @@
     <section class="modal-layer full" id="creation-modal" hidden>
       <div class="creation-modal">
         <header class="creation-head">
-          <div class="creation-title"><span class="creation-icon">费</span><h2 id="creation-title">新建费曼练习-动物城单位换算秘籍</h2></div>
+          <div class="creation-title"><span class="creation-icon">费</span><h2 id="creation-title">新建费曼任务-动物城单位换算秘籍</h2></div>
           <button class="close-btn" id="close-creation-modal" type="button">×</button>
         </header>
 
         <div class="creation-body">
           <aside class="creation-rail">
             <button class="source-tab active" data-anchor-target="content-section" type="button">费曼内容</button>
-            <button class="source-tab" data-anchor-target="rule-section" type="button">费曼规则</button>
+            <button class="source-tab" id="rail-rule-tab" data-anchor-target="rule-section" type="button">费曼规则</button>
             <button class="source-tab" data-anchor-target="preview-submit-section" type="button">预览提交</button>
           </aside>
           <main class="creation-work">
@@ -155,10 +157,26 @@
                 <div class="content-edit-area">
                   <div class="content-column-head">
                     <div><h2>费曼内容</h2><p>学生在小学堂小程序中看到的讲解材料。</p></div>
-                    <div class="segment"><button class="active" data-content-type="question" type="button">题目</button><button data-content-type="image" type="button">图片</button><button data-content-type="video" type="button">视频</button></div>
+                    <div class="segment" id="content-type-segment"><button class="active" data-content-type="question" type="button" hidden>题目</button><button data-content-type="image" type="button">图片</button><button data-content-type="video" type="button">视频</button></div>
                   </div>
-                  <div class="field shared-prompt"><label>学生侧提示语</label><input id="student-prompt-input" value="请先观察这张单位换算秘籍，再像小老师一样讲清不同单位家族的换算方法。" /></div>
-                  <div data-content-panel="question"><div class="field"><label>题目内容</label><textarea id="question-content-input" rows="4">请结合“动物城单位换算秘籍”，讲一讲长度、质量、面积、人民币和时间分别属于哪些单位家族，并说明大单位变小单位、小单位变大单位时应该怎样换算。</textarea></div><div class="grid two compact-grid"><div class="field"><label>题目来源</label><select id="question-source"><option value="manual">手动录入</option><option value="bank">从题库中引用</option></select></div></div></div>
+                  <div class="field shared-prompt" id="shared-prompt-field"><label>练习要求</label><input id="student-prompt-input" value="请先观察这张单位换算秘籍，再像小老师一样讲清不同单位家族的换算方法。" /></div>
+                  <div data-content-panel="question">
+                    <div class="field question-source-field">
+                      <label>题目来源</label>
+                      <div class="question-source-line">
+                        <select id="question-source"><option value="bank">从题库引用</option></select>
+                        <button class="btn" id="open-question-picker" type="button">题库选题</button>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label>题目内容</label>
+                      <textarea id="question-content-input" rows="3" hidden></textarea>
+                      <article class="question-stem-card empty" id="question-stem-card" aria-label="题目内容">
+                        <p>暂未选择题目，请点击“题库选题”添加题目。</p>
+                        <div class="grid-thumb stem-grid" aria-hidden="true"></div>
+                      </article>
+                    </div>
+                  </div>
                   <div data-content-panel="image" hidden>
                     <div class="image-upload-card" data-image-upload>
                       <button class="image-upload-preview" id="image-preview-box" type="button" aria-label="选择图片"><span>+</span><img id="image-preview" alt="" hidden /></button>
@@ -174,6 +192,25 @@
                     </div>
                   </div>
                   <div data-content-panel="video" hidden><div class="upload-box"><strong>上传视频素材</strong><span>支持课程片段、实验视频、老师示范讲解。</span><button class="btn" type="button">选择视频</button></div></div>
+                  <div class="story-content-dialog" id="story-content-dialog" hidden>
+                    <div class="story-input-zone" aria-label="双语故事表演内容输入">
+                      <div class="story-attachment-list" id="story-attachment-list" hidden>
+                        <article class="rule-attachment image" id="story-image-file" hidden>
+                          <button class="attachment-preview" id="preview-story-image" type="button"><span>图</span><strong>布置作业截图.png</strong></button><button id="delete-story-image" type="button">×</button>
+                        </article>
+                        <article class="rule-attachment video" id="story-video-file" hidden>
+                          <button class="attachment-preview" id="play-story-video" type="button"><span>视</span><strong>学员作答视频.mp4</strong></button><button id="delete-story-video" type="button">×</button>
+                        </article>
+                      </div>
+                      <textarea id="story-prompt-input" rows="5" placeholder="请输入学生侧提示语，例如：请根据题目讲清做题方法、判断依据和易错点。">请根据老师布置的英语题目，用语音或视频讲清楚每道题的做题方法、判断依据，以及容易出错的地方。</textarea>
+                      <div class="rule-input-toolbar">
+                        <div class="rule-input-left">
+                          <button class="tool-pill" id="story-image-upload" type="button">添加图片</button>
+                          <button class="tool-pill" id="story-video-upload" type="button">上传视频</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <section class="student-preview-card">
                   <h2>小学堂预览</h2>
@@ -195,57 +232,39 @@
             </section>
 
             <section class="section-panel" id="rule-section">
-              <div class="section-head"><div><h2>费曼规则</h2><p>AI 对练和费曼报告的判别依据。</p></div><span class="status waiting" id="rule-status">待确认</span></div>
+              <div class="section-head"><div><h2>费曼规则</h2><p>AI 费曼报告的判别依据</p></div></div>
               <div class="section-body rule-dialog-body">
                 <section class="rule-dialog">
                   <div class="rule-chat-zone" aria-label="费曼规则对话区域">
-                    <div class="rule-zone-title"><strong>对话区域</strong><span>AI 将根据老师输入的信息生成可编辑的规则草稿。</span></div>
-                    <div class="rule-message teacher">
-                      <div class="rule-message-bubble">请根据这份四年级单位换算材料，帮我生成一套 AI 费曼对练规则。</div>
-                    </div>
+                    <div class="rule-zone-title"><strong>对话区域</strong><span>AI 将根据老师输入的信息总结、归纳、抽取成费曼规则</span></div>
                     <div class="rule-message ai">
-                      <div class="rule-message-bubble">请通过下方文字、语音或视频描述规则，点击“生成费曼规则”后，AI 会整理为可用于对练和报告评分的费曼规则。</div>
-                    </div>
-                    <div class="rule-message teacher" id="rule-generation-request-wrap" hidden>
-                      <div class="rule-message-bubble" id="rule-generation-request">请根据输入的文字生成费曼规则</div>
-                    </div>
-                    <div class="rule-message ai" id="rule-generated-reply" hidden>
-                      <div class="rule-message-bubble generated-rule-output" id="ai-rule-output"></div>
+                      <div class="rule-message-bubble">请通过文字、语音或视频描述规则，点击发送后，AI 会整理为可用于报告评分的费曼规则。</div>
                     </div>
                   </div>
 
                   <div class="rule-input-zone" aria-label="费曼规则信息输入区域">
-                    <div class="rule-zone-title"><strong>信息输入区域</strong><span>可选择文字、语音或视频任一种方式描述规则。</span></div>
-                    <div class="rule-input-actions">
-                      <button class="rule-input-card" id="rule-voice-record" type="button">
-                        <span>语音</span><strong>老师语音录入</strong><em>录制一段规则说明</em>
-                      </button>
-                      <button class="rule-input-card" id="rule-video-upload" type="button">
-                        <span>视频</span><strong id="rule-video-source-title">上传视频录入</strong><em id="rule-video-source-desc">上传讲解或示范视频</em>
-                      </button>
-                    </div>
-                    <div class="rule-text-entry">
-                      <label for="rule-prompt">文字录入</label>
-                      <textarea id="rule-prompt" rows="4" placeholder="输入费曼规则描述，例如：先让学生分类单位家族，再追问换算方向和面积进率。">希望 AI 先让学生按长度、质量、面积、人民币、时间五类单位家族进行分类说明，再追问常用换算关系。学生需要说清“大变小用乘法，小变大用除法”，面积换算要特别说明相邻单位之间是 100 倍，最后用 2.45 千米、1450 克或 1 米 7 厘米任选一题做示范。</textarea>
-                    </div>
-                    <div class="rule-file-list">
-                      <article class="rule-file-chip voice" id="rule-voice-file" hidden>
-                        <span>音频</span><div><strong>单位换算规则录音.m4a</strong><em>00:38 · 老师语音录入</em></div><button id="delete-rule-voice" type="button">删除</button>
+                    <div class="rule-attachment-list" id="rule-attachment-list">
+                      <article class="rule-attachment image" id="rule-image-file" hidden>
+                        <button class="attachment-preview" id="preview-rule-image" type="button"><span>图</span><strong>规则说明图片.png</strong></button><button id="delete-rule-image" type="button">×</button>
                       </article>
-                      <article class="rule-file-chip video" id="rule-video-file" hidden>
-                        <span>视频</span><div><strong>单位换算规则说明.mp4</strong><em>02:16 · 上传视频录入</em></div><button id="delete-rule-video" type="button">删除</button>
+                      <article class="rule-attachment voice" id="rule-voice-file" hidden>
+                        <button class="attachment-preview" id="play-rule-voice" type="button"><span>音</span><strong>单位换算规则录音.m4a</strong></button><button id="delete-rule-voice" type="button">×</button>
                       </article>
-                      <article class="rule-file-chip video" id="bank-rule-video-file" hidden>
-                        <span>视频</span><div><strong>题库讲解视频.mp4</strong><em>03:12 · 通过题库获取讲解视频</em></div><button id="delete-bank-rule-video" type="button">删除</button>
+                      <article class="rule-attachment video" id="rule-video-file" hidden>
+                        <button class="attachment-preview" id="play-rule-video" type="button"><span>视</span><strong>单位换算规则说明.mp4</strong></button><button id="delete-rule-video" type="button">×</button>
+                      </article>
+                      <article class="rule-attachment video" id="bank-rule-video-file" hidden>
+                        <button class="attachment-preview" id="play-bank-rule-video" type="button"><span>视</span><strong>题库讲解视频.mp4</strong></button><button id="delete-bank-rule-video" type="button">×</button>
                       </article>
                     </div>
-                  </div>
-
-                  <div class="rule-action-zone" aria-label="费曼规则底部操作按钮区域">
-                    <button class="btn primary" id="generate-rule" type="button">生成费曼规则</button>
-                    <div class="inline-actions" id="rule-generated-actions" hidden>
-                      <button class="btn" id="regenerate-rule" type="button">重新生成</button>
-                      <button class="btn primary" id="confirm-ai-rule" type="button">确认规则</button>
+                    <textarea id="rule-prompt" rows="4" placeholder="请描述您想咨询的问题，按Shift+Enter换行，按Enter直接发送。">请围绕学生提交的英语题目讲解语音/视频，抽取一套费曼报告评分规则：重点判断学生是否讲清题意、语法依据、选项排除过程、错因分析和表达清晰度。</textarea>
+                    <div class="rule-input-toolbar">
+                      <div class="rule-input-left">
+                        <button class="tool-pill" id="rule-image-upload" type="button">添加图片</button>
+                        <button class="tool-pill" id="rule-voice-record" type="button">语音输入</button>
+                        <button class="tool-pill" id="rule-video-upload" type="button"><span id="rule-video-source-title">上传视频</span></button>
+                      </div>
+                      <button class="send-rule-btn" id="send-rule-message" type="button" aria-label="发送">↑</button>
                     </div>
                   </div>
                 </section>
@@ -268,21 +287,21 @@
               </div>
               <div class="picker-summary"><span>共筛选 <strong>10000</strong> 道题</span><button type="button">综合排序</button><button type="button">测试版</button><button type="button">最新 ↓</button><a href="#">全部添加</a></div>
               <div class="question-card selected">
-                <div class="q-meta"><span>一般</span><b>解答题</b><em>来源:2023-2024学年湖南省长沙...</em><strong>轴对称（4年级）</strong></div>
-                <div class="q-body"><i>1</i><p>先根据对称轴补全轴对称图形，再画出这个轴对称图形向右平移5格后的图形。</p><div class="grid-thumb"></div></div>
+                <div class="q-meta"><span>一般</span><b>填空题</b><em>来源:2023-2024学年校内题库...</em><strong>长方体体积（5年级）</strong></div>
+                <div class="q-body image-question"><i>1</i><img src="assets/question-volume-water.png" alt="长方体玻璃缸水深变化题" /></div>
                 <footer><a href="#">“线上/线下”均可使用</a><span>更新:2026-06-15 15:24:28</span><button type="button">纠错</button><button type="button">展开解析</button><strong>已加入</strong></footer>
               </div>
-              <div class="question-card">
-                <div class="q-meta"><span>一般</span><b>计算题</b><em>来源:2023-2024学年湖南省长沙...</em><strong>乘、除法的简便运算</strong></div>
-                <div class="q-body"><i>2</i><p>简便计算。<br />16×35×125<br />35+35×99<br />27.9+4.62+12.38-4.9</p></div>
-                <footer><a href="#">“线上/线下”均可使用</a><span>更新:2026-06-15 15:23:37</span><button type="button">纠错</button><button type="button">展开解析</button><button class="join" type="button">+加入</button></footer>
+              <div class="question-card selected">
+                <div class="q-meta"><span>一般</span><b>解答题</b><em>来源:2023-2024学年校内题库...</em><strong>长方体棱长和（5年级）</strong></div>
+                <div class="q-body image-question"><i>2</i><img src="assets/question-gift-ribbon.png" alt="礼盒彩带长度题" /></div>
+                <footer><a href="#">“线上/线下”均可使用</a><span>更新:2026-06-15 15:23:37</span><button type="button">纠错</button><button type="button">展开解析</button><strong>已加入</strong></footer>
               </div>
-              <div class="picker-footer"><span>已添加 <strong>1</strong> 个题目</span><button type="button">取消</button><button class="primary" type="button">完成添加</button></div>
+              <div class="picker-footer"><span>已添加 <strong>2</strong> 个题目</span><button type="button">取消</button><button class="primary" type="button">完成添加</button></div>
             </section>
           </aside>
         </div>
 
-        <footer class="creation-footer" id="preview-submit-section"><span>当前为草稿，确认费曼规则后可提交质检</span><div class="inline-actions"><button class="btn" id="save-draft" type="button">保存草稿</button><button class="btn primary" id="publish-button" type="button">完成创建</button></div></footer>
+        <footer class="creation-footer" id="preview-submit-section"><span hidden></span><div class="inline-actions"><button class="btn" id="save-draft" type="button">取消创建</button><button class="btn primary" id="publish-button" type="button">完成创建</button></div></footer>
       </div>
     </section>
 
@@ -298,12 +317,23 @@
       </div>
     </section>
 
+    <section class="modal-layer" id="image-upload-dialog" hidden>
+      <div class="rule-file-dialog">
+        <header><h2>添加图片</h2><button class="close-btn" id="close-image-dialog" type="button">×</button></header>
+        <div class="rule-upload-body">
+          <div class="video-upload-drop"><span>+</span><strong>选择规则说明图片</strong><em>支持课堂板书、解题步骤或参考资料截图</em></div>
+          <p>原型中点击“选择图片”即可生成图片附件，用于发送到对话区域。</p>
+        </div>
+        <footer><button class="btn" id="cancel-rule-image" type="button">取消</button><button class="btn primary" id="finish-rule-image" type="button">选择图片</button></footer>
+      </div>
+    </section>
+
     <section class="modal-layer" id="video-upload-dialog" hidden>
       <div class="rule-file-dialog">
         <header><h2>上传视频录入</h2><button class="close-btn" id="close-video-dialog" type="button">×</button></header>
         <div class="rule-upload-body">
           <div class="video-upload-drop"><span>+</span><strong>上传规则说明视频</strong><em>支持老师示范讲解、课程片段或录屏说明</em></div>
-          <p>原型中点击“上传视频”即可生成视频文件，用于后续生成费曼规则。</p>
+          <p>原型中点击“上传视频”即可生成视频文件，用于发送后生成费曼规则。</p>
         </div>
         <footer><button class="btn" id="cancel-video-upload" type="button">取消</button><button class="btn primary" id="finish-video-upload" type="button">上传视频</button></footer>
       </div>
