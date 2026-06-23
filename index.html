@@ -157,6 +157,7 @@
                 <div class="content-edit-area">
                   <div class="content-column-head">
                     <div><h2>费曼内容</h2><p>学生在小学堂小程序中看到的讲解材料。</p></div>
+                    <div class="segment story-content-tabs" id="story-content-tabs" hidden><button class="active" data-story-content-tab="graphic" type="button">图文</button><button data-story-content-tab="question" type="button">题目</button></div>
                     <div class="segment" id="content-type-segment"><button class="active" data-content-type="question" type="button" hidden>题目</button><button data-content-type="image" type="button">图片</button><button data-content-type="video" type="button">视频</button></div>
                   </div>
                   <div class="field shared-prompt" id="shared-prompt-field"><label>练习要求</label><input id="student-prompt-input" value="请先观察这张单位换算秘籍，再像小老师一样讲清不同单位家族的换算方法。" /></div>
@@ -243,6 +244,13 @@
                   </div>
 
                   <div class="rule-input-zone" aria-label="费曼规则信息输入区域">
+                    <div class="quick-rule-tags" id="quick-rule-tags" aria-label="快捷费曼规则标签">
+                      <span>快捷费曼规则</span>
+                      <button type="button" data-rule-tag="grammar">语法依据讲解</button>
+                      <button type="button" data-rule-tag="choice">选项排除说明</button>
+                      <button type="button" data-rule-tag="error">错因定位追问</button>
+                      <button type="button" data-rule-tag="expression">表达清晰度</button>
+                    </div>
                     <div class="rule-attachment-list" id="rule-attachment-list">
                       <article class="rule-attachment image" id="rule-image-file" hidden>
                         <button class="attachment-preview" id="preview-rule-image" type="button"><span>图</span><strong>规则说明图片.png</strong></button><button id="delete-rule-image" type="button">×</button>

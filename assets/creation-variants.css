@@ -10,6 +10,19 @@
   margin-bottom: 16px;
 }
 
+.story-content-tabs[hidden],
+.quick-rule-tags[hidden] {
+  display: none;
+}
+
+.story-content-tabs {
+  flex-shrink: 0;
+}
+
+.story-content-tabs button {
+  min-width: 72px;
+}
+
 .question-source-line {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -110,6 +123,10 @@
   margin-top: 4px;
 }
 
+.creation-modal.story-question-mode .shared-prompt {
+  display: grid;
+}
+
 .story-input-zone {
   display: grid;
   gap: 12px;
@@ -204,6 +221,39 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 13px;
+}
+
+.quick-rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--iteach-divider);
+  padding: 0 0 12px;
+}
+
+.quick-rule-tags span {
+  color: var(--iteach-text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.quick-rule-tags button {
+  min-height: 30px;
+  border: 1px solid #d8e3f1;
+  border-radius: 999px;
+  background: #f7faff;
+  color: var(--iteach-text-secondary);
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.quick-rule-tags button.active {
+  border-color: var(--iteach-blue-600);
+  background: #e8f2ff;
+  color: var(--iteach-blue-600);
 }
 
 .practice-material .preview-question-card {

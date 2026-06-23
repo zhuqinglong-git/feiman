@@ -261,9 +261,13 @@
   font-size: 14px;
   font-weight: 600;
 }
+.report-entry-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 30px;
+}
 .feynman-task a {
   display: block;
-  margin-top: 42px;
   color: #20b879;
   font-size: 15px;
   font-weight: 800;

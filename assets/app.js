@@ -23,6 +23,8 @@ const state = {
   selectedQuestion: "q1",
   questionPickerOpen: false,
   questionAdded: false,
+  storyContentTab: "graphic",
+  selectedRuleTags: [],
 };
 
 const subjectLabels = {
@@ -65,6 +67,41 @@ const bilingualRuleLines = [
   "若学生只说答案、不讲原因，AI 追问“你是根据哪个关键词或语法结构判断的？”",
   "报告中按题意理解、语法依据、错因分析、英文表达清晰度、追问应答五项评分，并给出老师后续讲评建议。",
 ];
+
+const quickRulePresets = {
+  grammar: {
+    label: "语法依据讲解",
+    lines: [
+      "学生需要先说出题干中的关键词，并判断题目考查的时态、固定搭配或句型结构。",
+      "AI 判断学生是否能把答案和语法依据对应起来，例如 be going to、一般将来时或动词三单变化。",
+      "若学生只说答案，AI 追问“你是根据哪个词或哪条语法规则判断的？”",
+    ],
+  },
+  choice: {
+    label: "选项排除说明",
+    lines: [
+      "学生需要逐一说明错误选项为什么不合适，不能只说正确答案。",
+      "AI 重点检查学生是否讲清选项之间的时态、人称、动词形式或语义差异。",
+      "报告中记录学生是否具备排除干扰项的能力，并标记容易误选的选项。",
+    ],
+  },
+  error: {
+    label: "错因定位追问",
+    lines: [
+      "当学生讲解不完整或出现错误时，AI 先定位错因属于审题、语法、词义还是表达不清。",
+      "AI 使用追问帮助学生补充原因，例如“这里为什么不能选 visits？”或“题目时间提示词是什么？”",
+      "报告中输出错因类型和建议老师课后重点跟进的知识点。",
+    ],
+  },
+  expression: {
+    label: "表达清晰度",
+    lines: [
+      "学生需要用完整句表达做题过程，尽量包含题意复述、判断依据和最终结论。",
+      "AI 判断学生讲解是否有顺序、有因果关系，是否能让同学听懂。",
+      "报告中按表达完整度、逻辑顺序、关键词使用和中英文表达清晰度给出评价。",
+    ],
+  },
+};
 
 function qs(selector) {
   return document.querySelector(selector);
@@ -155,6 +192,9 @@ function openCreationModal() {
   setText("#creation-title", `新建费曼任务-${name}-${getCreationTitleSuffix()}`);
   closeNameDialog();
   modal.hidden = false;
+  state.storyContentTab = "graphic";
+  state.questionPickerOpen = false;
+  state.selectedRuleTags = [];
   applyCreationVariant();
   showToast("已进入费曼任务创建");
 }
@@ -190,42 +230,53 @@ function applyCreationVariant() {
   const isBrain = variant === "brain";
   const isTeacher = variant === "teacher";
   const isStoryLike = variant === "bilingual" || isTeacher;
+  const isBilingual = variant === "bilingual";
+  const isBilingualQuestion = isBilingual && state.storyContentTab === "question";
   if (modal) {
     modal.classList.toggle("variant-brain", isBrain);
-    modal.classList.toggle("variant-bilingual", variant === "bilingual");
+    modal.classList.toggle("variant-bilingual", isBilingual);
     modal.classList.toggle("variant-teacher", isTeacher);
     modal.classList.toggle("no-rule", isBrain || isTeacher);
+    modal.classList.toggle("story-question-mode", isBilingualQuestion);
   }
 
   setHidden("#content-type-segment", true);
+  setHidden("#story-content-tabs", !isBilingual);
   qsa("[data-content-type]").forEach((button) => {
     button.hidden = isBrain || isStoryLike || button.dataset.contentType === "question";
     button.classList.toggle("active", isBrain && button.dataset.contentType === "question");
   });
-  setHidden("#shared-prompt-field", !isBrain);
-  setHidden("#story-content-dialog", !isStoryLike);
+  setHidden("#shared-prompt-field", !(isBrain || isBilingualQuestion));
+  setHidden("#story-content-dialog", !(isStoryLike && !isBilingualQuestion));
+  qsa("[data-story-content-tab]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.storyContentTab === state.storyContentTab);
+  });
   setHidden("#rule-section", isBrain || isTeacher);
   setHidden("#rail-rule-tab", isBrain || isTeacher);
+  setHidden("#quick-rule-tags", !isBilingual);
   const footerText = qs("#preview-submit-section > span");
   if (footerText) footerText.hidden = true;
 
   qsa("[data-content-panel]").forEach((panel) => {
-    panel.hidden = !isBrain || panel.dataset.contentPanel !== "question";
+    panel.hidden = !(isBrain || isBilingualQuestion) || panel.dataset.contentPanel !== "question";
   });
 
-  if (isBrain) {
+  if (isBrain || isBilingualQuestion) {
     state.contentType = "question";
     const source = qs("#question-source");
     const promptInput = qs("#student-prompt-input");
     if (source) source.value = "bank";
-    if (promptInput && !promptInput.dataset.brainInitialized) {
+    if (isBrain && promptInput && !promptInput.dataset.brainInitialized) {
       promptInput.value = "请完成下面题目，并讲讲你的思路和解题方法。";
       promptInput.dataset.brainInitialized = "true";
+    }
+    if (isBilingualQuestion && promptInput) {
+      promptInput.value = "请根据题目讲清做题方法、判断依据和容易出错的地方。";
     }
     updateQuestionStemCard();
   }
 
-  if (variant === "bilingual") {
+  if (isBilingual) {
     const storyInput = qs("#story-prompt-input");
     const rulePrompt = qs("#rule-prompt");
     state.storyImageFile = true;
@@ -243,6 +294,7 @@ function applyCreationVariant() {
 
   scrollToCreationSection("content-section");
   updateStoryAttachments();
+  updateQuickRuleTags();
   updateStudentPreview();
   updateQuestionPicker();
 }
@@ -331,6 +383,13 @@ function updateStudentPreview() {
     return;
   }
 
+  if (variant === "bilingual" && state.storyContentTab === "question") {
+    if (prompt) prompt.textContent = promptInput ? promptInput.value : "请根据题目讲清做题方法、判断依据和容易出错的地方。";
+    preview.className = `practice-material question${state.questionAdded ? "" : " empty"}`;
+    preview.innerHTML = buildQuestionStemPreview();
+    return;
+  }
+
   if (variant === "bilingual" || variant === "teacher") {
     if (prompt) prompt.textContent = storyInput ? storyInput.value : "";
     preview.className = `practice-material story${state.storyImageFile || state.storyVideoFile ? "" : " empty"}`;
@@ -384,11 +443,20 @@ function setContentType(type) {
   updateQuestionPicker();
 }
 
+function setStoryContentTab(tab) {
+  state.storyContentTab = tab;
+  state.questionPickerOpen = false;
+  if (tab === "question") state.contentType = "question";
+  applyCreationVariant();
+}
+
 function updateQuestionPicker() {
   const source = qs("#question-source");
   const picker = qs("[data-question-picker]");
   const modal = qs("#creation-modal .creation-modal");
-  const showPicker = getCreationVariant() === "brain" && state.contentType === "question" && source && source.value === "bank" && state.questionPickerOpen;
+  const variant = getCreationVariant();
+  const canPickQuestion = variant === "brain" || (variant === "bilingual" && state.storyContentTab === "question");
+  const showPicker = canPickQuestion && state.contentType === "question" && source && source.value === "bank" && state.questionPickerOpen;
   if (picker) picker.hidden = !showPicker;
   if (modal) modal.classList.toggle("question-picker-mode", showPicker);
   updateBankRuleVideo();
@@ -397,6 +465,22 @@ function updateQuestionPicker() {
 function updateBankRuleVideo() {
   state.bankRuleVideoFile = false;
   updateRuleInputFiles();
+}
+
+function updateQuickRuleTags() {
+  qsa("[data-rule-tag]").forEach((button) => {
+    button.classList.toggle("active", state.selectedRuleTags.includes(button.dataset.ruleTag));
+  });
+  updateSendButtonState();
+}
+
+function toggleQuickRuleTag(tag) {
+  if (state.selectedRuleTags.includes(tag)) {
+    state.selectedRuleTags = state.selectedRuleTags.filter((item) => item !== tag);
+  } else {
+    state.selectedRuleTags = [...state.selectedRuleTags, tag];
+  }
+  updateQuickRuleTags();
 }
 
 function confirmQuestionFromBank() {
@@ -651,6 +735,44 @@ function getCurrentGeneratedRuleLines() {
   return getCreationVariant() === "bilingual" ? bilingualRuleLines : generatedRuleLines;
 }
 
+function getSelectedRulePresets() {
+  return state.selectedRuleTags.map((tag) => quickRulePresets[tag]).filter(Boolean);
+}
+
+function buildRulePresetText(preset, prefix) {
+  return [`${prefix}${preset.label}的费曼规则`, ...preset.lines.map((line, index) => `${index + 1}. ${line}`)].join("\n");
+}
+
+function buildRuleGenerationContent(userText, rewriteRule = "") {
+  if (rewriteRule) {
+    return {
+      title: "收到，我将按照您的规则进行执行，费曼规则如下：",
+      text: rewriteRule,
+    };
+  }
+
+  const presets = getSelectedRulePresets();
+  if (presets.length) {
+    const sections = [];
+    if (userText) {
+      sections.push("根据您输入的内容，整理费曼规则如下：");
+      sections.push(getCurrentGeneratedRuleLines().map((line, index) => `${index + 1}. ${line}`).join("\n"));
+      presets.forEach((preset) => sections.push(buildRulePresetText(preset, "并综合")));
+    } else {
+      presets.forEach((preset) => sections.push(buildRulePresetText(preset, "已加入")));
+    }
+    return {
+      title: "思考完毕，整理费曼规则如下：",
+      text: sections.join("\n\n"),
+    };
+  }
+
+  return {
+    title: "思考完毕，整理费曼规则如下：",
+    text: getCurrentGeneratedRuleLines().map((line, index) => `${index + 1}. ${line}`).join("\n"),
+  };
+}
+
 function clearRuleInputAttachments() {
   state.imageRuleFile = false;
   state.voiceRuleFile = false;
@@ -661,7 +783,7 @@ function clearRuleInputAttachments() {
 }
 
 function hasRuleInputContent() {
-  return Boolean(getRulePromptText() || getRuleMessageAttachments().length);
+  return Boolean(getRulePromptText() || getRuleMessageAttachments().length || getSelectedRulePresets().length);
 }
 
 function extractRewriteRule(text) {
@@ -762,16 +884,17 @@ function sendRuleMessage() {
   const prompt = qs("#rule-prompt");
   const text = getRulePromptText();
   const attachments = getRuleMessageAttachments();
-  if (!text && !attachments.length) {
+  const selectedPresets = getSelectedRulePresets();
+  if (!text && !attachments.length && !selectedPresets.length) {
     showToast("请先输入内容再发送");
     return;
   }
-  appendRuleMessage("teacher", buildTeacherMessageHtml(text, attachments));
+  appendRuleMessage("teacher", buildTeacherMessageHtml(text || selectedPresets.map((preset) => preset.label).join("、"), attachments));
   state.ruleInputMode = state.voiceRuleFile ? "voice" : state.videoRuleFile || state.bankRuleVideoFile ? "video" : "text";
   if (prompt) prompt.value = "";
   clearRuleInputAttachments();
   updateSendButtonState();
-  startRuleGenerationFlow(extractRewriteRule(text));
+  startRuleGenerationFlow(extractRewriteRule(text), text);
   showToast("已发送到对话区域");
 }
 
@@ -866,7 +989,7 @@ function stopRuleGeneration() {
   showToast("已停止输出");
 }
 
-function startRuleGenerationFlow(rewriteRule = "") {
+function startRuleGenerationFlow(rewriteRule = "", userText = "") {
   if (state.isGeneratingRule) {
     stopRuleGeneration();
     return;
@@ -888,11 +1011,10 @@ function startRuleGenerationFlow(rewriteRule = "") {
   }, 500);
   state.ruleGenerationTimer = window.setTimeout(() => {
     state.ruleGenerationTimer = null;
-    const text = rewriteRule ? rewriteRule : getCurrentGeneratedRuleLines().map((line, index) => `${index + 1}. ${line}`).join("\n");
-    const title = rewriteRule ? "收到，我将按照您的规则进行执行，费曼规则如下：" : "思考完毕，整理费曼规则如下：";
-    output.innerHTML = `<div class="rule-dimension-title">${title}</div><pre class="stream-rule-text"></pre>`;
+    const generated = buildRuleGenerationContent(userText, rewriteRule);
+    output.innerHTML = `<div class="rule-dimension-title">${generated.title}</div><pre class="stream-rule-text"></pre>`;
     const streamOutput = output.querySelector(".stream-rule-text");
-    if (streamOutput) typeRuleText(streamOutput, text);
+    if (streamOutput) typeRuleText(streamOutput, generated.text);
   }, 2000);
 }
 
@@ -1025,6 +1147,8 @@ function bindTemplateEvents() {
     });
   });
   qsa("[data-content-type]").forEach((button) => button.addEventListener("click", () => setContentType(button.dataset.contentType)));
+  qsa("[data-story-content-tab]").forEach((button) => button.addEventListener("click", () => setStoryContentTab(button.dataset.storyContentTab)));
+  qsa("[data-rule-tag]").forEach((button) => button.addEventListener("click", () => toggleQuickRuleTag(button.dataset.ruleTag)));
   qsa("[data-question]").forEach((button) => button.addEventListener("click", () => selectQuestion(button.dataset.question)));
   qsa("[data-anchor-target]").forEach((button) => button.addEventListener("click", () => scrollToCreationSection(button.dataset.anchorTarget)));
 }
